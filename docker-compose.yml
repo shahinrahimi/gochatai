@@ -4,23 +4,24 @@ services:
     build: ./backend/
     restart: always
     ports:
-      - 6601:6601
+      - 6601:5000
     deploy:
-      mode: replicate
+      mode: replicated
       replicas: 1
-
+    environment:
+      DB_URL: "postgres://user:password@postgres:5432/gochataidb?sslmode=disable&connect_timeout=5"
 
   postgres:
     image: postgres:14.0
     restart: always
     ports:
-      - 6606:6606
+      - 6602:5432
     deploy:
       mode: replicate
       replicas: 1
     environment:
-      POSTGRES_DB: chats
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gochataidb
+      POSTGRES_USER: user 
+      POSTGRES_PASSWORD: password 
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
