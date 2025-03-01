@@ -21,8 +21,11 @@ func main() {
 	if dbURL == "" {
 		logger.Fatal("DB_URL not found in env variables!")
 	}
+  // create config for connection to DB
+  cfg := NewConfig(dbURL, logger)
+
 	// try connect to DB
-	conn := connectToDB(dbURL)
+	conn := cfg.connectToDB()
 	if conn == nil {
 		logger.Fatal("The connection to DB is nil")
 	}

@@ -9,24 +9,36 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func connectToDB(dbURL string) *sql.DB {
+type Config struct {
+  dbURL string
+  l *log.Logger
+}
+  
+func NewConfig(dbURL string, l *log.Logger) *Config {
+  return &Config{
+    dbURL: dbURL,
+    l: l,
+  }
+}
+
+func (c *Config) connectToDB() *sql.DB {
 	var count = 0
 	for {
-		conn, err := openDB(dbURL)
+		conn, err := openDB(c.dbURL)
 		if err != nil {
-			log.Printf("Postgres DB not ready yet... %v", err)
+			c.l.Printf("Postgres DB not ready yet... %v", err)
 			count++
 		} else {
-			log.Println("Connected to Postgres DB!")
+			c.l.Println("Connected to Postgres DB!")
 			return conn
 		}
 
 		if count > 10 {
-			log.Println("Failed to connect to DB after maximum tries...")
+			c.l.Println("Failed to connect to DB after maximum tries...")
 			return nil
 		}
 		sleepTime := time.Second * time.Duration(count)
-		log.Printf("Backing off for %v seconds.", sleepTime)
+		c.l.Printf("Backing off for %v seconds.", sleepTime)
 		time.Sleep(sleepTime)
 		continue
 	}
