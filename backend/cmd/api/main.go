@@ -17,7 +17,6 @@ var dbURL = os.Getenv("DB_URL")
 
 
 func main() {
-
 	// check if dbURL is not empty 
 	if dbURL == "" {
 		logger.Fatal("DB_URL not found in env variables!")
