@@ -1,9 +1,8 @@
 package main
 
 import (
-	"backend/internal/middlwares"
+	"backend/internal/utils"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,23 +12,19 @@ const (
 	port = 5000
 )
 
-
+var logger = utils.GetLogger()
+var dbURL = os.Getenv("DB_URL")
 
 
 func main() {
-	// create a custom logger
-	logger := log.New(os.Stdout, "[GOCHATAI-API] ", log.Ldate|log.Ltime|log.Lshortfile)
 
-	// load DB_URL from env
-	dbURL := os.Getenv("DB_URL")
+	// check if dbURL is not empty 
 	if dbURL == "" {
 		logger.Fatal("DB_URL not found in env variables!")
 	}
-  // create config for connection to DB
-  cfg := NewConfig(dbURL, logger)
 
 	// try connect to DB
-	conn := cfg.connectToDB()
+	conn := connectToDB(dbURL)
 	if conn == nil {
 		logger.Fatal("The connection to DB is nil")
 	}
@@ -37,12 +32,8 @@ func main() {
 	// create fibre app
 	app := fiber.New()
 
-  // Register global middlware
-  app.Use(middlwares.LoggerMiddleware)
-	// simple route
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("hello, world")
-	})
+  // setup routes
+  SetupRoutes(app)
 
 	// start server and listen
 	logger.Printf("Starting server on port: %d", port)
