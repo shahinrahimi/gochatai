@@ -17,4 +17,6 @@ func SetupRoutes(app *fiber.App) {
   
   // health-check hander
   api.Get("/ping",handlers.Ping)
+  // hellow ollama handler
+  api.Get("/hello",handlers.HelloOllama)
 }

@@ -25,3 +25,8 @@ services:
       POSTGRES_PASSWORD: password 
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
+
+  # ollama:
+    # image: ollama/ollama
+    # ports:
+      # - "7000:11434"
