@@ -4,7 +4,7 @@ services:
     build: ./backend/
     restart: always
     ports:
-      - 6601:5000
+      - 6000:5000
     deploy:
       mode: replicated
       replicas: 1
@@ -15,7 +15,7 @@ services:
     image: postgres:14.0
     restart: always
     ports:
-      - 6602:5432
+      - 5432:5432
     deploy:
       mode: replicate
       replicas: 1

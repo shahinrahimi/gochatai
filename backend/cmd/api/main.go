@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/middlwares"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,9 @@ import (
 const (
 	port = 5000
 )
+
+
+
 
 func main() {
 	// create a custom logger
@@ -33,6 +37,8 @@ func main() {
 	// create fibre app
 	app := fiber.New()
 
+  // Register global middlware
+  app.Use(middlwares.LoggerMiddleware)
 	// simple route
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("hello, world")
