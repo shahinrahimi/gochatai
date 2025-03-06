@@ -2,19 +2,30 @@ import './App.css'
 import React from 'react'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
-
+import { Textarea } from './components/ui/textarea' 
 function App() {
 
-  const [model, setModel] = React.useState<string>("")
+  const [model, setModel] = React.useState<string>("ds")
   const [role, setRole] = React.useState<string>("")
   const [content, setContent] = React.useState<string>("")
+  const [reply, setReply] = React.useState<string>("")
 
   const fetchResponse = () => {
-    const url = "http://localhost:3000/api/hello"
-    fetch(url)
+    const url = "http://localhost:3000/api/generate"
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: model,
+        prompt: content
+      })
+    })
       .then(data => data.json())
       .then(data => {
         console.log(data)
+        setReply(data?.data?.response)
       })
       .catch(err => {
         console.error("error fetching data", err)
@@ -45,6 +56,10 @@ function App() {
     />  
 
     <Button onClick={fetchResponse}>Confirm</Button>
+    <Textarea 
+      readOnly={true}
+      value={reply} 
+    />
   </div>
   )
 
