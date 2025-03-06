@@ -23,4 +23,6 @@ func SetupRoutes(app *fiber.App) {
   api.Get("/ping",handlers.Ping)
   // hellow ollama handler
   api.Get("/hello",handlers.HelloOllama)
+  // generate via ollama
+  api.Post("/generate", handlers.Generate)
 }
