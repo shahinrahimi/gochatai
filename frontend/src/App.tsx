@@ -11,7 +11,7 @@ function App() {
   const [reply, setReply] = React.useState<string>("")
 
   const fetchResponse = () => {
-    const url = "http://localhost:3000/api/generate"
+    const url = "http://localhost:3000/generate"
     fetch(url, {
       method: "POST",
       headers: {
