@@ -37,6 +37,9 @@ func Generate(w http.ResponseWriter, r*http.Request) error {
     return ErrorJSON(w, err)
   }
 
+  // temp: make sure it is not streamed!
+  or.Stream = false
+
   // create a request 
   requestURL := fmt.Sprintf("%s%s", OllamaBaseUrl, "/api/generate")
   var orp OllamaGenerateResponsePayload
