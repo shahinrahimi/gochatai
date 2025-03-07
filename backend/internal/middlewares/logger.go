@@ -1,21 +1,21 @@
-
 package middlewares
 
 import (
 	"backend/internal/utils"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
 
-
-func Logger(c *fiber.Ctx) error {
-  // get global singleton logger
+func Logger(next http.Handler) http.Handler {
   logger := utils.GetLogger()
-  logger.Info("Request received", logrus.Fields{
-    "method": c.Method(),
-    "path": c.Path(),
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    logger.Info("Request received", logrus.Fields{
+      "Method": r.Method,
+      "URL": r.URL,
+     "RemoteAddr": r.RemoteAddr,
+    })
+    next.ServeHTTP(w,r)
   })
-
-  return c.Next()
 }
+
