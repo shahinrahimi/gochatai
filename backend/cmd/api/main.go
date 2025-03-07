@@ -4,38 +4,40 @@ import (
 	"backend/internal/utils"
 	"fmt"
 	"os"
-
-	"github.com/gofiber/fiber/v2"
+"net/http"
 )
 
 const (
 	port = 5000
 )
 
+type Application struct{}
+
 var logger = utils.GetLogger()
 var dbURL = os.Getenv("DB_URL")
 
 
 func main() {
+  app := &Application{}
+
 	// check if dbURL is not empty 
 	if dbURL == "" {
 		logger.Fatal("DB_URL not found in env variables!")
 	}
 
 	// try connect to DB
-	conn := connectToDB(dbURL)
-	if conn == nil {
+	if conn := app.connectToDB(dbURL); conn == nil {
 		logger.Fatal("The connection to DB is nil")
-	}
+  }
 
-	// create fibre app
-	app := fiber.New()
+  srv := &http.Server{
+    Addr: fmt.Sprintf(":%d", port),
+    Handler: app.rotues(),
+  }
 
-  // setup routes
-  SetupRoutes(app)
+  logger.Printf("Starting gochatai backend service on port %d\n", port)
+  if err := srv.ListenAndServe(); err != nil {
+    logger.Fatal(err)
+  }
 
-	// start server and listen
-	logger.Printf("Starting server on port: %d", port)
-	listenAddr := fmt.Sprintf(":%d", port)
-	logger.Fatal(app.Listen(listenAddr))
 }

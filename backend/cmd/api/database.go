@@ -10,7 +10,7 @@ import (
 
 
 
-func connectToDB(dbURL string) *sql.DB {
+func (app *Application) connectToDB(dbURL string) *sql.DB {
 
   // get DB URL f
 	var count = 0

@@ -1,28 +1,39 @@
 package main
 
 import (
-	"backend/internal/handlers"
-  "backend/internal/middlewares"
+	"backend/internal/middlewares"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
-  "github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
+func (app *Application) rotues() http.Handler{
+  mux := chi.NewRouter()
 
-func SetupRoutes(app *fiber.App) {
-  app.Use(cors.New(cors.Config{
-    AllowOrigins: "http://localhost:5173",
+  mux.Use(cors.Handler(cors.Options{
+    AllowedOrigins: []string{"http://localhost:5173"},
+    AllowedMethods: []string{http.MethodGet, http.MethodPost},
+    AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
   }))
-  // register global middlewares
-  app.Use(middlewares.Logger)
-
-  // main route - api
-  api := app.Group("/api")
   
-  // health-check hander
-  api.Get("/ping",handlers.Ping)
-  // hellow ollama handler
-  api.Get("/hello",handlers.HelloOllama)
-  // generate via ollama
-  api.Post("/generate", handlers.Generate)
+  // register global middlwares
+  mux.Use(middlewares.Logger)
+  
+  mux.Use(middlewares.HearBeat("/ping"))
+  
+  mux.Post("/generate", MakeHandlerFunc(Generate))
+
+  return mux
+
 }
+type CustomeHandler func(w http.ResponseWriter, r*http.Request) error
+
+func MakeHandlerFunc(f CustomeHandler) http.HandlerFunc {
+  return func(w http.ResponseWriter, r *http.Request) {
+    if err := f(w,r); err != nil {
+      logger.Printf("error %v", err)
+    }
+  }
+}
+
