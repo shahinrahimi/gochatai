@@ -23,7 +23,8 @@ func (app *Application) rotues() http.Handler{
   mux.Use(middlewares.HearBeat("/ping"))
   
   mux.Post("/generate", MakeHandlerFunc(Generate))
-
+  
+  mux.Post("/generatestream", MakeHandlerFunc(GenerateStreamEnabled))
   return mux
 
 }
