@@ -9,7 +9,47 @@ function App() {
   const [role, setRole] = React.useState<string>("")
   const [content, setContent] = React.useState<string>("")
   const [reply, setReply] = React.useState<string>("")
-
+  const fetchStream = async () => {
+    const url = "http://localhost:3000/generatestream"
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: model,
+        prompt: content
+      })
+    });
+    const reader = res.body?.getReader();
+    if (!reader){
+      return
+    }
+    const decoder = new TextDecoder()
+    let done = false
+    //let text = ''
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      if (doneReading) break
+      const chunk = decoder.decode(value, { stream: true })
+    // Process line-seprated JONS responses
+      const jsonObjects = chunk.trim().split("\n")
+      jsonObjects.forEach(element => {
+        try {
+          const data = JSON.parse(element);
+          if (data.response) {
+            setReply(prev => prev + data.response)
+          }
+        } catch (error) {
+          console.log("JSON parsing error: ", error)
+        }
+        
+      });
+      //text += decoder.decode(value, { stream: true })
+      //console.log(text)
+      //setReply((prev) => prev + text)
+    }
+  }
   const fetchResponse = () => {
     const url = "http://localhost:3000/generate"
     fetch(url, {
@@ -56,6 +96,7 @@ function App() {
     />  
 
     <Button onClick={fetchResponse}>Confirm</Button>
+    <Button onClick={fetchStream}>Confirm Via Stram</Button>
     <Textarea 
       readOnly={true}
       value={reply} 
