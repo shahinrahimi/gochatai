@@ -9,6 +9,7 @@ function App() {
   const [role, setRole] = React.useState<string>("")
   const [content, setContent] = React.useState<string>("")
   const [reply, setReply] = React.useState<string>("")
+  const [thinking, setThinkng] = React.useState<boolean>(false)
   const fetchStream = async () => {
     const url = "http://localhost:3000/generatestream"
     const res = await fetch(url, {
@@ -38,7 +39,16 @@ function App() {
         try {
           const data = JSON.parse(element);
           if (data.response) {
-            setReply(prev => prev + data.response)
+            const text = data.response;
+            // Detect and ignore <Think>...</ThinK>
+            if (text.includes("<think>")) {
+              setThinkng(true)
+
+            } else if (text.includes("</think>")) {
+              setThinkng(false)
+            } else {
+              setReply(prev => prev + text)
+            }
           }
         } catch (error) {
           console.log("JSON parsing error: ", error)
@@ -97,12 +107,41 @@ function App() {
 
     <Button onClick={fetchResponse}>Confirm</Button>
     <Button onClick={fetchStream}>Confirm Via Stram</Button>
-    <Textarea 
+    {thinking && <ThinkingUE />}
+    {!thinking && <Textarea 
       readOnly={true}
-      value={reply} 
-    />
+      value={reply}
+    />}
   </div>
   )
 
+}
+
+const ThinkingUE = () => {
+  return (
+<div className="mt-2 flex items-center text-gray-500">
+                    <svg
+                        className="animate-spin h-5 w-5 mr-2"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                        ></circle>
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                    </svg>
+                    Thinking...
+                </div>
+  )
 }
 export default App
