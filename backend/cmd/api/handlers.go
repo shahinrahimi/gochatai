@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -29,6 +30,26 @@ type OllamaGenerateResponsePayload struct {
   EvalDuration int64 `json:"eval_duration"`
   TotalDuration int64 `json:"total_duration"`
   LoadDuration int64 `json:"load_duration"`
+}
+
+
+// List Models
+type OllamaModelDetails struct {
+  Format string `json:"format"`
+  Family string `json:"family"`
+  Families *string `json:"famieies"` // handle null references
+  ParamaterSize string `json:"paramater_size"`
+  QuantizationLevel string `json:"quantization_level"`
+}
+type OllamaModelInfo struct {
+  Name string `json:"name"`
+  ModifiedAt string `json:"modified_at"`
+  Size int64 `json:"size"`
+  Digest string `json:"digest"` 
+  Details OllamaModelDetails `json:"details"`
+}
+type OllamaListModelsResponsePayload struct {
+  Models []OllamaModelInfo `json:"models"`
 }
 
 func Generate(w http.ResponseWriter, r*http.Request) error {
@@ -119,3 +140,40 @@ func GenerateStreamEnabled(w http.ResponseWriter, r*http.Request) error {
  return nil 
 
 }
+
+func ListModels(w http.ResponseWriter, r*http.Request) error {
+  // create http object
+  urlRequest := fmt.Sprintf("%s:%s", OllamaBaseUrl, "/api/tags")
+  req, err := http.NewRequest(http.MethodGet, urlRequest, nil)
+  if err != nil {
+    return ErrorJSON(w, err)
+  }
+
+  req.Header.Set("Content-Type", "application/json")
+
+  // create http client
+  cl := http.Client{}
+  resp, err := cl.Do(req)
+  if err != nil {
+    return ErrorJSON(w, err)
+  }
+  defer resp.Body.Close()
+
+  body, err := io.ReadAll(resp.Body)
+  if err != nil {
+    return ErrorJSON(w, err)
+  }
+  
+  var ol OllamaListModelsResponsePayload
+  if err := json.Unmarshal(body, &ol); err != nil {
+    return ErrorJSON(w, err)
+  }
+
+  return WriteJSON(w, http.StatusOK, &jsonResponse{
+    Error: false,
+    Message: "successfuly query model list",
+    Data: ol,
+  })
+}
+
+

@@ -25,7 +25,11 @@ func (app *Application) rotues() http.Handler{
   mux.Post("/generate", MakeHandlerFunc(Generate))
   
   mux.Post("/generatestream", MakeHandlerFunc(GenerateStreamEnabled))
+  
+  mux.Get("/list", MakeHandlerFunc(ListModels))
+
   return mux
+
 
 }
 type CustomeHandler func(w http.ResponseWriter, r*http.Request) error
