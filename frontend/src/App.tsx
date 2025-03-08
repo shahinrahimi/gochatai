@@ -3,13 +3,45 @@ import React from 'react'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Textarea } from './components/ui/textarea' 
+import { 
+  Select,
+  SelectItem,
+  SelectContent,
+  SelectTrigger,
+  SelectValue
+
+} from './components/ui/select'
+
+
+type Model = {
+  name:string
+}
+
+
 function App() {
 
   const [model, setModel] = React.useState<string>("ds")
+  const [models, setModels] = React.useState<Model[]>([])
   const [role, setRole] = React.useState<string>("")
   const [content, setContent] = React.useState<string>("")
   const [reply, setReply] = React.useState<string>("")
   const [thinking, setThinkng] = React.useState<boolean>(false)
+  React.useEffect(() => {
+    fetchModelList()
+  },[])
+  const fetchModelList = async () => {
+    const url = "http://localhost:3000/list"
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+
+    const data = await res.json()
+    console.log(data)
+    setModels(data.data.models)
+  }
   const fetchStream = async () => {
     const url = "http://localhost:3000/generatestream"
     const res = await fetch(url, {
@@ -74,7 +106,7 @@ function App() {
     })
       .then(data => data.json())
       .then(data => {
-        console.log(data)
+    console.log(data)
         setReply(data?.data?.response)
       })
       .catch(err => {
@@ -84,6 +116,13 @@ function App() {
   return (
   <div id="app" className="flex-col">
     <label htmlFor='model'>Model Name</label>
+    <Select>
+      <SelectTrigger className="w-[280px]">
+        <SelectValue placeholder="select a model" />
+      </SelectTrigger>
+      {models.length > 0 && <SelectContent>{models.map((element:Model) => ( <SelectItem key={element.name} value={element.name}>{element.name}</SelectItem> ))} </SelectContent>}
+    </Select>
+    
     <Input 
       name='model'
       placeholder='enter model name'
