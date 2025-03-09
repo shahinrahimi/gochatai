@@ -3,46 +3,19 @@ import React from 'react'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Textarea } from './components/ui/textarea' 
-import { 
-  Select,
-  SelectItem,
-  SelectContent,
-  SelectTrigger,
-  SelectValue
-
-} from './components/ui/select'
-
-
-type Model = {
-  name:string
-}
+import MarkdownMessage from './components/custom/MarkdownMessage'
+import SelectModel from './components/custom/SelectModel'
+import { Model } from './types'
 
 
 function App() {
-
-  const [model, setModel] = React.useState<string>("ds")
-  const [models, setModels] = React.useState<Model[]>([])
+  const [model, setModel] = React.useState<Model | null>(null)
   const [role, setRole] = React.useState<string>("")
   const [content, setContent] = React.useState<string>("")
   const [reply, setReply] = React.useState<string>("")
   const [thinking, setThinkng] = React.useState<boolean>(false)
-  React.useEffect(() => {
-    fetchModelList()
-  },[])
-  const fetchModelList = async () => {
-    const url = "http://localhost:3000/list"
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-
-    const data = await res.json()
-    console.log(data)
-    setModels(data.data.models)
-  }
-  const fetchStream = async () => {
+  
+  const fetchStream = async (modelName: string) => {
     const url = "http://localhost:3000/generatestream"
     const res = await fetch(url, {
       method: "POST",
@@ -50,7 +23,7 @@ function App() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: model,
+        model: modelName,
         prompt: content
       })
     });
@@ -92,7 +65,7 @@ function App() {
       //setReply((prev) => prev + text)
     }
   }
-  const fetchResponse = () => {
+  const fetchResponse = (modelName: string) => {
     const url = "http://localhost:3000/generate"
     fetch(url, {
       method: "POST",
@@ -100,7 +73,7 @@ function App() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: model,
+        model: modelName,
         prompt: content
       })
     })
@@ -113,22 +86,25 @@ function App() {
         console.error("error fetching data", err)
       })
   }
+  const handleFetchResponse = () => {
+    if (model){
+      fetchResponse(model.name)
+    } 
+  }
+  const handleFetchStreamResponse = () => {
+    if (model) {
+      fetchStream(model.name)
+    }
+  }
+  const handleFetchComplete = (m: Model | null) => {
+    setModel(m)
+    console.log("Models fethed. Active model: ", m?.name)
+  } 
   return (
-  <div id="app" className="flex-col">
+  <div id="app" className="flex-col w-full">
     <label htmlFor='model'>Model Name</label>
-    <Select>
-      <SelectTrigger className="w-[280px]">
-        <SelectValue placeholder="select a model" />
-      </SelectTrigger>
-      {models.length > 0 && <SelectContent>{models.map((element:Model) => ( <SelectItem key={element.name} value={element.name}>{element.name}</SelectItem> ))} </SelectContent>}
-    </Select>
-    
-    <Input 
-      name='model'
-      placeholder='enter model name'
-      value={model} 
-      onChange={(e) => setModel(e.target.value)}
-    />  
+    <SelectModel onFetchComplete={handleFetchComplete} />  
+     
     <label htmlFor='role'>Role</label>
     <Input 
       name='role' 
@@ -137,20 +113,18 @@ function App() {
       onChange={(e) => setRole(e.target.value)}
     />  
     <label htmlFor='content'>Content</label>
-    <Input 
+
+    <Textarea 
       name='content' 
       placeholder='ask a question e.g why the sky is blue?'
       value={content} 
       onChange={(e) => setContent(e.target.value)}
     />  
 
-    <Button onClick={fetchResponse}>Confirm</Button>
-    <Button onClick={fetchStream}>Confirm Via Stram</Button>
+    <Button onClick={handleFetchResponse}>Confirm</Button>
+    <Button onClick={handleFetchStreamResponse}>Confirm Via Stram</Button>
     {thinking && <ThinkingUE />}
-    {!thinking && <Textarea 
-      readOnly={true}
-      value={reply}
-    />}
+    {!thinking && <MarkdownMessage text={reply} />}
   </div>
   )
 
