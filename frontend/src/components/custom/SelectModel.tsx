@@ -8,39 +8,28 @@ import {
   SelectValue
 } from '../ui/select'
 import { Model } from "@/types";
+import { fetchModels } from "@/api";
 const modelSignal = signal<Model | null>(null)
 const modelsSignal = signal<Model[]>([])
+
 interface SelectModelProps {
   onFetchComplete: (defaultModel: Model | null) => void
 }
 const SelectModel = ({onFetchComplete}: SelectModelProps) => {
+  
   React.useEffect(() => {
-    // function to fetch model lists
-    const fetchModelList = async () => {
-      try {
-        const url = "http://localhost:3000/list"
-        const res = await fetch(url, {
-          method: "GET",
-          headers: {"Content-Type": "application/json"}
-        })
-
-        const data = await res.json()
-        console.log(data)
-        const modelData: Model[] = data.data.models
-        if (modelData.length > 0 ) {
-          modelsSignal.value = modelData
-          modelSignal.value = modelData[0]
-          onFetchComplete(modelData[0])
-        }
-
-      } catch (error) {
-        console.error("Error fetching models:", error)
+    const handleFetchModels = async () => {
+      const models = await fetchModels()
+      if (models.length > 0 ) {
+        modelsSignal.value = models
+        modelSignal.value = models[0]
+        onFetchComplete(models[0])
       }
-    }
 
-    fetchModelList()
-
+    } 
+    handleFetchModels()
   },[]) 
+
   const handleModelChange = (modelName: string) => {
     modelsSignal.value.forEach((m:Model) => {
       if (m.name == modelName) {
