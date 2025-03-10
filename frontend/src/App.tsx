@@ -1,12 +1,14 @@
-import './App.css'
-//import React from 'react'
-import Lab from './container/Lab' 
+import { Routes, Route } from 'react-router-dom'
+import HomePage from './pages/HomePage'
+import NotFoundPage from './pages/NotFoundPage'
 
+import './App.css'
 function App() {
   return (
-    <div id="app" className="flex-col w-full">
-      <Lab />
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/*" element={<NotFoundPage />} />
+    </Routes>
   )
 }
 
