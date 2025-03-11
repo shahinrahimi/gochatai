@@ -2,6 +2,7 @@ import React from "react"
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea' 
+import WelcomeAI  from './welcome-ai.tsx'
 import MarkdownMessage from '../components/custom/MarkdownMessage'
 import SelectModel from '../components/custom/SelectModel'
 import { Model } from '../types'
@@ -46,48 +47,60 @@ const Lab = () => {
   }
 
   return (
-    <div className="lab">
-      <label htmlFor='model'>Model Name</label>
-      <SelectModel 
-        onFetchComplete={handleOnListModelComplete} 
-      />  
+    <div className="w-full min-h-screen">
+      <div className="flex gap-8 justify-between">
+        <div className="flex gap-2 items-center" >
+          <label className="text-nowrap" htmlFor='model'>Model Name</label>
+          <SelectModel 
+            onFetchComplete={handleOnListModelComplete} 
+          />  
+        </div>
+                     
+        <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center">
+            <label htmlFor="seed">Seed</label>
+            <Input 
+              name="seed"
+              placeholder="enter a seed value"
+              value={seed}
+              type="number"
+              onChange={(e) => setSeed(Number(e.target.value))}
+            />    
+          </div>
+          <div className="flex gap-2 items-center">
+            <label htmlFor="temperature">Temperature</label>
+            <Input 
+              name="temperature" 
+              placeholder="enter temperature value the more the assistance will be more creative"
+              value={temperature} 
+              type="number"
+              onChange={(e) => setTemperature(Number(e.target.value))}
+            />     
+          </div>
+        </div>
+      </div> 
+      <div className="p-2 min-h-80">
+        {reply == "" && <WelcomeAI />}
+        {reply != "" && !thinking && <MarkdownMessage text={reply} />}
+        {thinking && <LoadingThinking />}
+      </div>
       
-      <label htmlFor="seed">Seed</label>
-      <Input 
-        name="seed"
-        placeholder="enter a seed value"
-        value={seed}
-        type="number"
-        onChange={(e) => setSeed(Number(e.target.value))}
-      />  
-
-      <label htmlFor="temperatore">Temperature</label>
-      <Input 
-        name="temperature" 
-        placeholder="enter temperature value the more the assistance will be more creative"
-        value={temperature} 
-        type="number"
-        onChange={(e) => setTemperature(Number(e.target.value))}
-      />  
-      <label htmlFor='content'>Content</label>
-
+     <div className="flex-col p-2"> 
       <Textarea 
         name="prompt" 
         placeholder="ask a question e.g why the sky is blue?"
         value={prompt} 
         onChange={(e) => setPrompt(e.target.value)}
       />
-
-      <Button 
-        onClick={handleFetchResponse}
-      >Confirm</Button>
-
-      <Button 
-        onClick={handleFetchResponseStream}
-      >Confirm Via Stram</Button>
-      {thinking ? <LoadingThinking/> : <MarkdownMessage text={reply} />}
-
+      <div className="flex py-3 justify-between">
+         <Button onClick={handleFetchResponse}
+          >Confirm</Button>
+           <Button onClick={handleFetchResponseStream}
+          >Confirm Via Stram</Button>
+      </div>
     </div>
+    </div>
+    
   )
 }
 
