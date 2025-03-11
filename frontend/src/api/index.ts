@@ -1,5 +1,5 @@
 import { Model } from '../types/'
-const API_BASE_URL = "http://localhost:3000"
+const API_BASE_URL = "http://localhost:8000"
 const API_LIST_MODELS = API_BASE_URL + "/list"
 const API_GENERATE_ONCE = API_BASE_URL + "/generate"
 const API_GENERATE_STREAM = API_BASE_URL + "/generatestream"

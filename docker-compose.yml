@@ -4,7 +4,7 @@ services:
     build: ./backend/
     restart: always
     ports:
-      - 3000:5000
+      - 8000:5000
     deploy:
       mode: replicated
       replicas: 1
