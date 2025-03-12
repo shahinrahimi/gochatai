@@ -19,14 +19,15 @@ const SelectModel = ({onFetchComplete}: SelectModelProps) => {
   
   React.useEffect(() => {
     const handleFetchModels = async () => {
-      const models = await fetchModels()
-      if (models.length > 0 ) {
-        modelsSignal.value = models
-        modelSignal.value = models[0]
-        onFetchComplete(models[0])
-      }
-
-    } 
+      await fetchModels((ms) => {
+        if (ms.length > 0) {
+          modelsSignal.value = ms 
+          modelSignal.value = ms[0]
+          onFetchComplete(ms[0])
+        }
+      },(err: any) => {
+        console.log("Error in fethcing models list: ", err)
+      })} 
     handleFetchModels()
   },[]) 
 

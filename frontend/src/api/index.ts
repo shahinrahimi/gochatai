@@ -4,9 +4,26 @@ const API_LIST_MODELS = API_BASE_URL + "/list"
 const API_GENERATE_ONCE = API_BASE_URL + "/generate"
 const API_GENERATE_STREAM = API_BASE_URL + "/generatestream"
 
-    
+type GenerateComplitionOptionRequest = {
+  seed: number
+  temperature: number
+  num_ctx?: number
+}
 
-export const fetchModels = async (): Promise<Model[]> => {
+export type GenerateComplitionRequest = {
+  model: string; // modelName
+  prompt: string;
+  stream?: boolean;
+  suffix?: string;
+  image?: string[];
+  format?: string;
+  system?: string;
+  raw?: boolean;
+  options?: GenerateComplitionOptionRequest | undefined;
+  keep_alive?: string | undefined // default 5m 
+}
+
+export const fetchModels = async (onSuccess: (modles: Model[]) => void, onError: (err: any) => void) => {
   try {
     const url = API_LIST_MODELS
     const res = await fetch(url, {
@@ -16,27 +33,31 @@ export const fetchModels = async (): Promise<Model[]> => {
         
     // check is response is ok
     if (!res.ok) throw new Error(`Error fetching models: ${res.statusText}`)
-    const data = await res.json()
-    console.log(`response from ${url}\ndata:`, data)
+    try {
+      
+      const data = await res.json()
+      console.log(`response from ${url}\ndata:`, data)
+      const dataModels = data.data.models as Model[]
+      onSuccess(dataModels)
 
-    return data.data.models
-
+    } catch (error) {
+      console.log("Error parsing data to models: ", error)
+    }
+    
   } catch (error) {
     console.error("Error fetching models:", error)
+    onError(error)
     return []
   }
 }
 
-export const fetchReplyOnce = async (modelName: string, prompt: string): Promise<string> => {
+export const fetchReplyOnce = async (requestPayload: GenerateComplitionRequest, onSuccess: (message: string) => void, onError: (error:any) => void) => {
   try {
     const url = API_GENERATE_ONCE 
     const res = await fetch(url, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        model: modelName,
-        prompt: prompt
-      })
+      body: JSON.stringify(requestPayload)
     })
 
     // check if response is ok
@@ -44,24 +65,23 @@ export const fetchReplyOnce = async (modelName: string, prompt: string): Promise
     
     const data = await res.json()
     console.log(`response from ${url}\ndata:`, data)
+    const dataMessage = data.data.response
+    onSuccess(dataMessage)
     
-    return data.data.response
   } catch (error) {
     console.error("Error fetching reply: ", error)
+    onError(error)
     return ""
   }
 }
 
-export const fetchReplyStream = async (modelName: string, prompt: string, onResponse: (text: string) => void, onError: (error:any) => void) => {
+export const fetchReplyStream = async (requestPayload: GenerateComplitionRequest ,onSuccess: (text: string) => void, onError: (error:any) => void) => {
   const url = API_GENERATE_STREAM
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        model: modelName,
-        prompt: prompt
-      })
+      body: JSON.stringify(requestPayload)
     })
 
     const reader = res.body?.getReader()
@@ -78,13 +98,10 @@ export const fetchReplyStream = async (modelName: string, prompt: string, onResp
           const data = JSON.parse(element)
           if (data.response) {
             const text = data.response
-            // Handling thinking state
-            if (text.includes("<think>")) {
-              //isThinking = true;
-            } else if (text.includes("</think>")) {
-              //isThinking = false;
+            if (text.includes("<think>") || text.includes("</think>")) {
+              // Do nothign
             } else {
-              onResponse(text);
+              onSuccess(text);
             }
           }
         } catch (error) {

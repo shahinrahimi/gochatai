@@ -8,33 +8,77 @@ import SelectModel from '../components/custom/SelectModel'
 import { Model } from '../types'
 import { fetchReplyOnce, fetchReplyStream } from '../api'
 import LoadingThinking from "../components/custom/LoadingThinking"
-
+type Sender = "user" | "assistante"
+type Message = {
+  id: number;
+  content: string;
+  sender: Sender;
+  timestamp: string;
+}
 const Lab = () => {
   const [model, setModel] = React.useState<Model | null>(null)
   const [seed, setSeed] = React.useState<number>(1)
   const [temperature, setTemperature] = React.useState<number>(0.9)
   const [prompt, setPrompt] = React.useState<string>("")
   const [reply, setReply] = React.useState<string>("")
+  const [messages, setMessages] = React.useState<Message[]>([])
   const [thinking, setThinking] = React.useState<boolean>(false)
+  const [system, setSystem] = React.useState<string>("")
+
+  const addMessage = (text: string, sender:Sender) => {
+    const newMessage: Message = {
+      id: messages.length + 1,
+      content: text,
+      sender,
+      timestamp: new Date().toISOString()
+    }
+    setMessages((prev:Message[]) => [...prev, newMessage])
+  }
+
   const handleFetchResponse = async () => {
     if (model && prompt!="") {
+      if (reply != "") {
+        addMessage(reply, "assistante")
+      }
+      addMessage(prompt, "user")
+      setReply("")
       setThinking(true)
-      const res = await fetchReplyOnce(model.name, prompt)
-      setThinking(false)
-      setReply(res)
+      await fetchReplyOnce({
+        model: model.name,
+        prompt: prompt
+      }, (res) => {
+        setThinking(false)
+        setReply(res)
+      }, (err) => {
+        setThinking(false)
+        console.log("Error fetching response: ", err)
+      })
     }
   }
 
   const handleFetchResponseStream = async () => {
     if (model && prompt!="") {
+      // save already reply
+      if (reply != "") {
+        addMessage(reply, "assistante")
+      }
+      addMessage(prompt, "user")
       setReply("")
       setThinking(true)   
-      await fetchReplyStream(model.name, prompt, (text) => {
+      await fetchReplyStream({
+        model: model.name,
+        prompt: prompt,
+        system: "You are drunk one that lost every things in the life! answer like a drunk one.",
+        options: {
+          seed: seed,
+          temperature: temperature,
+        },
+      }, (text) => {
         setThinking(false)
         setReply(prev => prev + text)
       }, (err) => {
         setThinking(false) 
-        console.error("failed to fetch stream err:", err)       
+        console.error("Error fetching sreeam response err:", err)       
       })
     }
   }
@@ -78,9 +122,22 @@ const Lab = () => {
             />     
           </div>
         </div>
-      </div> 
+      </div>
+      <div className="p-2 min-h-10">
+        <div className="flex gap-2">
+
+        <label htmlFor="system">System</label>
+          <Textarea
+            name="system"
+            placeholder="enter system promt to override current system"
+            value={system}
+            onChange={(e) => setSystem(e.target.value)}
+          />
+        </div>
+      </div>
       <div className="p-2 min-h-80">
         {reply == "" && <WelcomeAI />}
+        {reply != "" && <RenderMessages ms={messages} />}
         {reply != "" && !thinking && <MarkdownMessage text={reply} />}
         {thinking && <LoadingThinking />}
       </div>
@@ -101,6 +158,21 @@ const Lab = () => {
     </div>
     </div>
     
+  )
+}
+interface RenderMessageInterface {
+  ms: Message[]
+}
+
+const RenderMessages = ({ms}: RenderMessageInterface) => {
+  return (
+    <ol>{ms.map((m:Message) => {
+      return (
+        <li key={m.id}>{m.content}</li>
+      )
+    })}
+    </ol>
+
   )
 }
 
