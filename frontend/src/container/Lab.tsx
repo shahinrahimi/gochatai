@@ -8,7 +8,7 @@ import SelectModel from '../components/custom/SelectModel'
 import { Model } from '../types'
 import { fetchReplyOnce, fetchReplyStream } from '../api'
 import LoadingThinking from "../components/custom/LoadingThinking"
-type Sender = "user" | "assistante"
+type Sender = "user" | "assistant"
 type Message = {
   id: number;
   content: string;
@@ -38,7 +38,7 @@ const Lab = () => {
   const handleFetchResponse = async () => {
     if (model && prompt!="") {
       if (reply != "") {
-        addMessage(reply, "assistante")
+        addMessage(reply, "assistant")
       }
       addMessage(prompt, "user")
       setReply("")
@@ -60,7 +60,7 @@ const Lab = () => {
     if (model && prompt!="") {
       // save already reply
       if (reply != "") {
-        addMessage(reply, "assistante")
+        addMessage(reply, "assistant")
       }
       addMessage(prompt, "user")
       setReply("")
@@ -68,7 +68,7 @@ const Lab = () => {
       await fetchReplyStream({
         model: model.name,
         prompt: prompt,
-        system: "You are drunk one that lost every things in the life! answer like a drunk one.",
+        system: system,
         options: {
           seed: seed,
           temperature: temperature,
@@ -137,7 +137,7 @@ const Lab = () => {
       </div>
       <div className="p-2 min-h-80">
         {reply == "" && <WelcomeAI />}
-        {reply != "" && <RenderMessages ms={messages} />}
+        {reply != "" && <MessageList ms={messages} />}
         {reply != "" && !thinking && <MarkdownMessage text={reply} />}
         {thinking && <LoadingThinking />}
       </div>
@@ -160,15 +160,21 @@ const Lab = () => {
     
   )
 }
-interface RenderMessageInterface {
+interface MessageListInterface {
   ms: Message[]
 }
 
-const RenderMessages = ({ms}: RenderMessageInterface) => {
+const MessageList = ({ms}: MessageListInterface) => {
   return (
-    <ol>{ms.map((m:Message) => {
+    <ol className="my-4 flex h-fit min-h-full flex-col gap-4" >{ms.map((m:Message, index) => {
       return (
-        <li key={m.id}>{m.content}</li>
+        <li 
+          key={index} 
+          data-role={m.sender}
+          className="max-w-[80%] rounded px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-wihte"
+        >
+          {m.content}
+        </li>
       )
     })}
     </ol>
