@@ -2,7 +2,9 @@ import { Model } from '../types/'
 const API_BASE_URL = "http://localhost:8000"
 const API_LIST_MODELS = API_BASE_URL + "/list"
 const API_GENERATE_ONCE = API_BASE_URL + "/generate"
+const API_GENERATE_CHAT_ONCE = API_BASE_URL + "/generatechat"
 const API_GENERATE_STREAM = API_BASE_URL + "/generatestream"
+const API_GENERATE_CHAT_STREAM = API_BASE_URL + "/generatechatstream"
 
 type GenerateComplitionOptionRequest = {
   seed: number
@@ -76,6 +78,46 @@ export const fetchReplyOnce = async (requestPayload: GenerateComplitionRequest, 
 }
 
 export const fetchReplyStream = async (requestPayload: GenerateComplitionRequest ,onSuccess: (text: string) => void, onError: (error:any) => void) => {
+  const url = API_GENERATE_STREAM
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(requestPayload)
+    })
+
+    const reader = res.body?.getReader()
+    if (!reader) throw new Error("Failed to get reader from response body")
+    const decoder = new TextDecoder()
+    let done = false
+    while (!done) {
+      const { value, done: doneReading } = await reader.read()
+      if (doneReading) break
+      const chunk = decoder.decode(value, { stream: true })
+      const jsonObject = chunk.trim().split("\n")
+      jsonObject.forEach((element) => {
+        try {
+          const data = JSON.parse(element)
+          if (data.response) {
+            const text = data.response
+            if (text.includes("<think>") || text.includes("</think>")) {
+              // Do nothign
+            } else {
+              onSuccess(text);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to parse JSON error: ", error)
+          onError(error)
+        }
+      })
+    }
+  } catch (error) {
+    console.error("Failed to fetching stram: ", error)
+    onError(error)
+  }
+}
+export const fetchChatStream = async (requestPayload: GenerateComplitionRequest ,onSuccess: (text: string) => void, onError: (error:any) => void) => {
   const url = API_GENERATE_STREAM
   try {
     const res = await fetch(url, {
