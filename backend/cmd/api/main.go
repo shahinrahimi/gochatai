@@ -3,22 +3,30 @@ package main
 import (
 	"backend/internal/utils"
 	"fmt"
+	"net/http"
 	"os"
-"net/http"
+
+	"github.com/shahinrahimi/ollamalite/ollama"
 )
 
 const (
 	port = 5000
 )
 
-type Application struct{}
+type Application struct{
+  oc *ollama.Client
+}
+
+func NewApplication(ollamaBaseUrl string) *Application{
+  return &Application{ollama.NewClient(ollamaBaseUrl)}
+}
 
 var logger = utils.GetLogger()
 var dbURL = os.Getenv("DB_URL")
 
 
 func main() {
-  app := &Application{}
+  app := NewApplication("http://host.docker.internal:11434")
 
 	// check if dbURL is not empty 
 	if dbURL == "" {
