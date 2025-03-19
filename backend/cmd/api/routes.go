@@ -22,11 +22,17 @@ func (app *Application) rotues() http.Handler{
   
   mux.Use(middlewares.HearBeat("/ping"))
   
-  mux.Post("/generate", MakeHandlerFunc(Generate))
+  mux.Post("/generate", MakeHandlerFunc(app.GenerateCompletion))
   
-  mux.Post("/generatestream", MakeHandlerFunc(GenerateStreamEnabled))
+  mux.Post("/generate-stream", MakeHandlerFunc(app.GenerateCompletionSSE))
+
+  mux.Post("/chat", MakeHandlerFunc(app.GenerateChatCompletion))
+
+  mux.Post("/chat-stream", MakeHandlerFunc(app.GenerateChatCompletionSSE))
   
-  mux.Get("/list", MakeHandlerFunc(ListModels))
+  mux.Get("/list", MakeHandlerFunc(app.ListLocalModels))
+
+  mux.Get("/list-running", MakeHandlerFunc(app.ListRunningModels))
 
   return mux
 

@@ -34,6 +34,7 @@ func ReadJSON(w http.ResponseWriter ,r *http.Request, data any) error {
   maxBytes := 1024 * 1024 // 1mb
   // check doc for MaxBytesReader
   r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
+  defer r.Body.Close()
   // create decoder
   dec := json.NewDecoder(r.Body)
   

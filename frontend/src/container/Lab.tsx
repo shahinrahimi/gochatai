@@ -151,9 +151,9 @@ const Lab = () => {
       />
       <div className="flex py-3 justify-between">
          <Button onClick={handleFetchResponse}
-          >Confirm</Button>
+          >Single JSON</Button>
            <Button onClick={handleFetchResponseStream}
-          >Confirm Via Stram</Button>
+          >Stream JSON</Button>
       </div>
     </div>
     </div>
