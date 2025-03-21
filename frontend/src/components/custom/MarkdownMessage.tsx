@@ -14,5 +14,4 @@ const MarkdownMessage = ({ text }:MDMessageInterface) => {
   )
 }
 
-
 export default MarkdownMessage

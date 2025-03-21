@@ -56,6 +56,7 @@ console.log('It works!')
         </header>
         <Textarea value={text} onChange={(e) => setText(e.target.value)} />
         <MarkdownMessage text={text} />
+        <code>"This is  a code"</code>
       </SidebarInset>
     </SidebarProvider>
   )
