@@ -4,10 +4,10 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea' 
 import WelcomeAI  from './welcome-ai.tsx'
-import MarkdownMessage from '../components/custom/MarkdownMessage'
+import { MarkdownMessage, MarkdownWithCode } from '../components/custom/MarkdownMessage'
 import SelectModel from '../components/custom/SelectModel'
 import { Model } from '../types'
-import { fetchReplyOnce, fetchReplyStream } from '../api'
+import { fetchGenerate, fetchReplyStream } from '../api'
 import LoadingThinking from "../components/custom/LoadingThinking"
 type Sender = "user" | "assistant"
 type Message = {
@@ -44,7 +44,7 @@ const Chat = () => {
       addMessage(prompt, "user")
       setReply("")
       setThinking(true)
-      await fetchReplyOnce({
+      await fetchGenerate({
         model: model.name,
         prompt: prompt
       }, (res) => {
@@ -140,6 +140,7 @@ const Chat = () => {
         {reply == "" && <WelcomeAI />}
         {reply != "" && <MessageList ms={messages} />}
         {reply != "" && !thinking && <MarkdownMessage text={reply} />}
+        {reply != "" && !thinking && <MarkdownWithCode text={reply} />}
         {thinking && <LoadingThinking />}
       </div>
       
