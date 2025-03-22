@@ -8,7 +8,7 @@ import {
   SelectValue
 } from '../ui/select'
 import { Model } from "@/types";
-import { fetchModels } from "@/api";
+import { fetchLocalModels as fetchModels } from "@/api";
 const modelSignal = signal<Model | null>(null)
 const modelsSignal = signal<Model[]>([])
 
