@@ -42,9 +42,11 @@ export interface GenerateCompletionRes {
   load_duration: number;
 }
 
+export type Role = "system" | "user" | "assistant" | "tool";
+
 // Define Message type
 export interface Message {
-  role: string;
+  role: Role;
   content: string;
   image?: string[];
   tool_calls?: string[];
@@ -54,10 +56,10 @@ export interface Message {
 export interface GenerateChatCompletionReq {
   model: string;
   messages: Message[];
-  tools: string[];
-  format: string;
+  tools?: string[];
+  format?: string;
   stream: boolean;
-  keep_alive: number;
+  keep_alive?: number;
 }
 
 // Define GenerateChatCompletionRes

@@ -1,23 +1,17 @@
 
 import React from "react"
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Textarea } from '../components/ui/textarea' 
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea' 
 import WelcomeAI  from './welcome-ai.tsx'
-import { MarkdownMessage, MarkdownWithCode } from '../components/custom/MarkdownMessage'
-import SelectModel from '../components/custom/SelectModel'
-import { Model } from '../types'
-import { fetchGenerate, fetchReplyStream } from '../api'
-import LoadingThinking from "../components/custom/LoadingThinking"
-type Sender = "user" | "assistant"
-type Message = {
-  id: number;
-  content: string;
-  sender: Sender;
-  timestamp: string;
-}
+import { MarkdownMessage, MarkdownWithCode } from '@/components/custom/MarkdownMessage'
+import SelectModel from '@/components/custom/SelectModel'
+import { fetchGenerate, fetchGenerateChat } from '@/api/generate'
+import { fetchGenereateStream, fetchGenereateChatStream } from '@/api/generate-stream'
+import { RunningModel, GenerateCompletionReq, GenerateChatCompletionReq, Message, Role} from '@/api/types.ts'
+import LoadingThinking from "@/components/custom/LoadingThinking"
 const Chat = () => {
-  const [model, setModel] = React.useState<Model | null>(null)
+  const [model, setModel] = React.useState<RunningModel | null>(null)
   const [seed, setSeed] = React.useState<number>(1)
   const [temperature, setTemperature] = React.useState<number>(0.9)
   const [prompt, setPrompt] = React.useState<string>("")
@@ -26,17 +20,18 @@ const Chat = () => {
   const [thinking, setThinking] = React.useState<boolean>(false)
   const [system, setSystem] = React.useState<string>("")
 
-  const addMessage = (text: string, sender:Sender) => {
+  const addMessage = (text: string, role: Role) => {
     const newMessage: Message = {
-      id: messages.length + 1,
+      //id: messages.length + 1,
+      role: role, 
       content: text,
-      sender,
-      timestamp: new Date().toISOString()
+      //sender,
+      //timestamp: new Date().toISOString()
     }
     setMessages((prev:Message[]) => [...prev, newMessage])
   }
 
-  const handleFetchResponse = async () => {
+  const handleFetchGenerate = async () => {
     if (model && prompt!="") {
       if (reply != "") {
         addMessage(reply, "assistant")
@@ -44,20 +39,59 @@ const Chat = () => {
       addMessage(prompt, "user")
       setReply("")
       setThinking(true)
-      await fetchGenerate({
+      const payload :GenerateCompletionReq = {
         model: model.name,
-        prompt: prompt
-      }, (res) => {
-        setThinking(false)
-        setReply(res)
-      }, (err) => {
-        setThinking(false)
-        console.log("Error fetching response: ", err)
-      })
+        prompt: prompt,
+        stream: false,
+        system: system,
+        options: {
+          seed: seed,
+          temperature: temperature
+        }
+      }
+      await fetchGenerate(
+        payload,
+        (res) => {
+          setThinking(false)
+          setReply(res)
+        },
+        (err) => {
+          setThinking(false)
+          console.log("failed to fetch response: ", err)
+        }
+      )
     }
   }
 
-  const handleFetchResponseStream = async () => {
+  const handleFetchGeneratedChat = async () => {
+    if (model && prompt!="") {
+      if (reply != "") {
+        addMessage(reply, "assistant")
+      }
+      addMessage(prompt, "user")
+      setReply("")
+      setThinking(true)
+      const payload :GenerateChatCompletionReq = {
+        model: model.name,
+        messages: messages,
+        stream: false,
+      }
+      await fetchGenerateChat(
+        payload,
+        (res) => {
+          setThinking(false)
+          setReply(res)
+        },
+        (err) => {
+          setThinking(false)
+          console.log("failed to fetch response: ", err)
+        }
+      )
+    }
+  }
+
+
+  const handleFetchGenerateStream = async () => {
     if (model && prompt!="") {
       // save already reply
       if (reply != "") {
@@ -66,25 +100,58 @@ const Chat = () => {
       addMessage(prompt, "user")
       setReply("")
       setThinking(true)   
-      await fetchReplyStream({
+      const payload :GenerateCompletionReq = {
         model: model.name,
         prompt: prompt,
+        stream: true,
         system: system,
         options: {
           seed: seed,
-          temperature: temperature,
-        },
-      }, (text) => {
-        setThinking(false)
-        setReply(prev => prev + text)
-      }, (err) => {
-        setThinking(false) 
-        console.error("Error fetching sreeam response err:", err)       
+          temperature: temperature
+        }
+      }
+
+      await fetchGenereateStream(
+        payload,
+        (text) => {
+          setThinking(false)
+          setReply(prev => prev + text)
+        }, 
+        (err) => {
+          setThinking(false) 
+          console.error("Error fetching sreeam response err:", err)       
+      })
+    }
+  }
+  const handleFetchGenerateChatStream = async () => {
+    if (model && prompt!="") {
+      // save already reply
+      if (reply != "") {
+        addMessage(reply, "assistant")
+      }
+      addMessage(prompt, "user")
+      setReply("")
+      setThinking(true)   
+      const payload :GenerateChatCompletionReq = {
+        model: model.name,
+        messages: messages,
+        stream: true,
+      }
+
+      await fetchGenereateChatStream(
+        payload,
+        (text) => {
+          setThinking(false)
+          setReply(prev => prev + text)
+        }, 
+        (err) => {
+          setThinking(false) 
+          console.error("Error fetching sreeam response err:", err)       
       })
     }
   }
 
-  const handleOnListModelComplete = (m: Model | null) => {
+  const handleOnListModelComplete = (m: RunningModel | null) => {
     if (m) {
       setModel(m)
       console.log("model set to: ", m.name)
@@ -152,9 +219,17 @@ const Chat = () => {
         onChange={(e) => setPrompt(e.target.value)}
       />
       <div className="flex py-3 justify-between">
-         <Button onClick={handleFetchResponse}
+         <Button 
+          onClick={handleFetchGenerate}
           >Confirm</Button>
-           <Button onClick={handleFetchResponseStream}
+          <Button 
+            onClick={handleFetchGeneratedChat}
+          >Confirm Chat</Button>
+          <Button 
+            onClick={handleFetchGenerateChatStream}
+          >Confirm Chat Via stream</Button>
+          <Button 
+            onClick={handleFetchGenerateStream}
           >Confirm Via Stram</Button>
       </div>
     </div>
@@ -172,7 +247,7 @@ const MessageList = ({ms}: MessageListInterface) => {
       return (
         <li 
           key={index} 
-          data-role={m.sender}
+          data-role={(m.role).toString()}
           className="max-w-[80%] rounded px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-wihte"
         >
           {m.content}

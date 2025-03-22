@@ -16,7 +16,7 @@ export async function fetchGenereateStream (
     "POST",
     undefined,
     requestPayload,
-    (chunk) => {
+    (chunk) => {      
       const jsonObject = chunk.trim().split("\n");
       jsonObject.forEach((element) => {
         try {
@@ -25,7 +25,7 @@ export async function fetchGenereateStream (
             const text = data.response;
             if (!text.includes("<think>") && !text.includes("</think>")) {
               onSuccess(text);
-            }
+            }   
           }
         } catch (error) {
           console.error("Failed to parse JSON error:", error);
