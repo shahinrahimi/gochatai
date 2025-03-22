@@ -11,7 +11,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem
-} from "../ui/sidebar"
+} from "@/components/ui/sidebar"
 
 const data = {
   navMain: [
@@ -30,7 +30,7 @@ const data = {
       ],
     },]
     }
-export function AppSidebar({ ...props }:React.ComponentProps<typeof Sidebar>) {
+const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -79,3 +79,6 @@ export function AppSidebar({ ...props }:React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   )
 }
+
+
+export default AppSidebar;

@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+import {Outlet} from 'react-router-dom'
+import AppSidebar from "@/components/custom/AppSidebar" 
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,40 +9,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb"
-import AppSidebar from "@/components/custom/AppSidebar";
-import MarkdownWithCode from "@/components/custom/MarkdownWithCode";
-import MarkdownMessage from "@/components/custom/MarkdownMessage";
 import { Separator } from "@radix-ui/react-select";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import {Textarea} from "@/components/ui/textarea"
-const HomePage = () => {
-  const [text, setText] = React.useState<string>(`
-A paragraph with *emphasis* and **strong importance**.
 
-> A block quote with ~strikethrough~ and a URL: https://reactjs.org.
 
-* Lists
-* [ ] todo
-* [x] done
 
-A table:
-
-| a | b |
-| - | - |
-~~~js
-console.log('It works!')
-~~~
-`)
-
-const code = `const greet = () => {
-  console.log("Hello, World!");
-};`;
-const markdown = `Here is some JavaScript code:
-
-~~~js
-console.log('It works!')
-~~~
-`  
+const Layout = () => { 
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -62,15 +36,12 @@ console.log('It works!')
             </Breadcrumb>
           </div> 
         </header>
-        <Textarea value={text} onChange={(e) => setText(e.target.value)} />
-        <MarkdownMessage text={text} />
-        <code>"This is  a code"</code>
-        <MarkdownWithCode text={markdown} />
-              </SidebarInset>
+        <Outlet />
+      </SidebarInset>
     </SidebarProvider>
-  )
 
+  ) 
 }
 
 
-export default HomePage
+export default Layout;
