@@ -1,17 +1,17 @@
-
 import React from "react"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea' 
-import WelcomeAI  from './welcome-ai.tsx'
-import { MarkdownMessage, MarkdownWithCode } from '@/components/custom/MarkdownMessage'
+import WelcomeAI  from '@/container/welcome-ai'
+import MessageList from "@/container/MessageList.tsx" 
 import SelectModel from '@/components/custom/SelectModel'
 import { fetchGenerate, fetchGenerateChat } from '@/api/generate'
 import { fetchGenereateStream, fetchGenereateChatStream } from '@/api/generate-stream'
-import { RunningModel, GenerateCompletionReq, GenerateChatCompletionReq, Message, Role} from '@/api/types.ts'
+import { LocalModel, GenerateCompletionReq, GenerateChatCompletionReq, Message, Role} from '@/api/types.ts'
 import LoadingThinking from "@/components/custom/LoadingThinking"
+import MarkdownWithCode from "@/components/custom/MarkdownWithCode"
 const Chat = () => {
-  const [model, setModel] = React.useState<RunningModel | null>(null)
+  const [model, setModel] = React.useState<LocalModel | null>(null)
   const [seed, setSeed] = React.useState<number>(1)
   const [temperature, setTemperature] = React.useState<number>(0.9)
   const [prompt, setPrompt] = React.useState<string>("")
@@ -151,7 +151,7 @@ const Chat = () => {
     }
   }
 
-  const handleOnListModelComplete = (m: RunningModel | null) => {
+  const handleOnListModelComplete = (m: LocalModel | null) => {
     if (m) {
       setModel(m)
       console.log("model set to: ", m.name)
@@ -205,9 +205,8 @@ const Chat = () => {
       </div>
       <div className="p-2 min-h-80">
         {reply == "" && <WelcomeAI />}
-        {reply != "" && <MessageList ms={messages} />}
-        {reply != "" && !thinking && <MarkdownMessage text={reply} />}
-        {reply != "" && !thinking && <MarkdownWithCode text={reply} />}
+        {<MessageList messages={messages} />}
+        <MarkdownWithCode text={reply} />
         {thinking && <LoadingThinking />}
       </div>
       
@@ -237,27 +236,24 @@ const Chat = () => {
     
   )
 }
-interface MessageListInterface {
-  ms: Message[]
-}
 
-const MessageList = ({ms}: MessageListInterface) => {
-  return (
-    <ol className="my-4 flex h-fit min-h-full flex-col gap-4" >{ms.map((m:Message, index) => {
-      return (
-        <li 
-          key={index} 
-          data-role={(m.role).toString()}
-          className="max-w-[80%] rounded px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-wihte"
-        >
-          {m.content}
-        </li>
-      )
-    })}
-    </ol>
-
-  )
-}
+//const MessageList = ({ms}: MessageListInterface) => {
+//  return (
+//    <ol className="my-4 flex h-fit min-h-full flex-col gap-4" >{ms.map((m:Message, index) => {
+//      return (
+//        <li 
+//          key={index} 
+//          data-role={(m.role).toString()}
+//          className="max-w-[80%] rounded px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-wihte"
+//        >
+//          {m.content}
+//        </li>
+//      )
+//    })}
+//    </ol>
+//
+//  )
+//}
 
 
 

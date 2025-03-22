@@ -1,7 +1,7 @@
 import React from "react";
-import Lab from "../container/Lab"
 import { AppSidebar } from "@/components/custom/AppSidebar";
-import { MarkdownMessage, MarkdownWithCode} from "@/components/custom/MarkdownMessage";
+import MarkdownWithCode from "@/components/custom/MarkdownWithCode";
+import MarkdownMessage from "@/components/custom/MarkdownMessage";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -68,10 +68,7 @@ console.log('It works!')
         <MarkdownMessage text={text} />
         <code>"This is  a code"</code>
         <MarkdownWithCode text={markdown} />
-        <SyntaxHighlighter language="javascript" style={atomDark}>
-        {code}
-        </SyntaxHighlighter>
-      </SidebarInset>
+              </SidebarInset>
     </SidebarProvider>
   )
 
