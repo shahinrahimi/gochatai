@@ -1,4 +1,4 @@
-import { api } from './api'
+import apiClient from './api'
 import {
   RunningModel, 
   LocalModel,
@@ -9,7 +9,7 @@ export async function fetchLocalModels(
   onSuccess: (models: LocalModel[]) => void,
   onError: (err: any) => void
 ){
-  return api<{data: { models: LocalModel[]}}>(
+  return apiClient.request<{data: { models: LocalModel[]}}>(
     ApiEndpoints.LIST_LOCAL_MODELS,
     "GET",
     undefined,
@@ -23,7 +23,7 @@ export async function fetchRunningModels(
   onSuccess: (models: RunningModel[]) => void,
   onError: (err: any) => void
 ){
-  return api<{data: { models: RunningModel[]}}>(
+  return apiClient.request<{data: { models: RunningModel[]}}>(
     ApiEndpoints.LIST_RUNNING_MODLES,
     "GET",
     undefined,

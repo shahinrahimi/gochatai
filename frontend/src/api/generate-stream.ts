@@ -1,4 +1,4 @@
-import {apiStreem} from './api'
+import apiClient from './api';
 import { 
   ApiEndpoints, 
   GenerateCompletionReq,
@@ -11,7 +11,7 @@ export async function fetchGenereateStream (
   onError: (error:any) => void
 ) {
   const url = ApiEndpoints.GENERATE_STREAM
-  return apiStreem(
+  return apiClient.requestStream(
     url,
     "POST",
     undefined,
@@ -43,7 +43,7 @@ export async function fetchGenereateChatStream (
   onError: (error:any) => void
 ) {
   const url = ApiEndpoints.GENERATE_CHAT_STREAM
-  return apiStreem(
+  return apiClient.requestStream(
     url,
     "POST",
     undefined,
