@@ -203,7 +203,7 @@ const Chat = () => {
           />
         </div>
       </div>
-      <div className="p-2 min-h-80 max-w-7xl mx-auto">
+      <div className="container p-2 mx-auto">
         {reply == "" && <WelcomeAI />}
         {<MessageList messages={messages} />}
         <MarkdownWithCode text={reply} />

@@ -5,15 +5,15 @@ import { Message } from "../api/types"
 
 const MessageList = ({messages}:{messages:Message[]}) => {
   return (
-    <ol>
+    <ol className="my-4 flex flex-col h-fit min-h-full gap-8">
       {messages.map((message:Message, index) => {
         if (message.role == "user") {
           return(
-            <li className="bg-cyan-700 text-white" key={index}>{message.content}</li>
+            <li className="max-w-[80%] rounded px-3 py-2 text-sm self-end bg-cyan-700 text-white" key={index}>{message.content}</li>
           )
         } else {
           return(
-            <li key={index}><MarkdownWithCode text={message.content}/></li>
+            <li className="max-w-[80%] rounded px-3 py-2 text-sm self-start  bg-gray-100 text-black "  key={index}><MarkdownWithCode text={message.content}/></li>
           )
         }
       })}

@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './pages/Layout'
 import Chat from '@/pages/Chat'
+import ChatLab from '@/pages/ChatLab'
+import CompletionLab from '@/pages/CompletionLab'
 import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
@@ -12,6 +14,8 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="chat" element={<Chat />} />
       </Route>
+      <Route path="/chat-lab" element={<ChatLab />} />
+      <Route path="/completion-lab" element={<CompletionLab />} />
       <Route path="/*" element={<NotFoundPage />} />
     </Routes>
   )

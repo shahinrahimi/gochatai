@@ -7,6 +7,12 @@ export enum ApiEndpoints {
   GENERATE_STREAM = "/generate-stream",
   GENERATE_CHAT_STREAM = "/chat-stream",
 }
+
+export type ApiResponse = {
+  Error: boolean,
+  Message: string,
+  Data: any
+}
 // api middleware types
 export type RequestMiddleware = (request: RequestInit, url: string) => Promise<void>;
 export type ResponseMiddleware = (response: Response, url: string) => Promise<Response>;
