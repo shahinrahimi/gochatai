@@ -237,24 +237,4 @@ const Chat = () => {
   )
 }
 
-//const MessageList = ({ms}: MessageListInterface) => {
-//  return (
-//    <ol className="my-4 flex h-fit min-h-full flex-col gap-4" >{ms.map((m:Message, index) => {
-//      return (
-//        <li 
-//          key={index} 
-//          data-role={(m.role).toString()}
-//          className="max-w-[80%] rounded px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-wihte"
-//        >
-//          {m.content}
-//        </li>
-//      )
-//    })}
-//    </ol>
-//
-//  )
-//}
-
-
-
 export default Chat;

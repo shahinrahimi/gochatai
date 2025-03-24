@@ -102,9 +102,10 @@ func (app *Application) GenerateChatCompletionSSE (w http.ResponseWriter, r*http
       data, _ := json.Marshal(chunk)
       fmt.Fprintln(w, string(data))
       flusher.Flush()
-    
     case err, _ := <-errCh:
-      return ErrorJSON(w, fmt.Errorf("Streaming error: %w", err))
+      if err != nil {
+        return ErrorJSON(w, fmt.Errorf("Streaming error: %w", err))
+      }
     }
   }
 

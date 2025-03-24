@@ -8,11 +8,13 @@ import { Bot, Send, User } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
 import { fetchGenerateChat } from "@/api/generate";
 import SelectModel from "@/components/custom/SelectModel";
+import { fetchGenereateChatStream } from "@/api/generate-stream";
 const ChatLab = () => {
   const [model, setModel] = React.useState<LocalModel | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [prompt, setPrompt] = React.useState<string>("")
   const [messages, setMessages] = React.useState<Message[]>([])
+  const [lastMessage, setLastMessage] = React.useState<string>("")
 
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
@@ -29,7 +31,7 @@ const ChatLab = () => {
     }
   }
 
-  const handleSendMessage = () => {
+  const handleGenerateChatOnce = () => {
     // add prompt if it is not empty
     if (prompt.trim() == "") {
       console.log("the prompt can't be empty string")
@@ -75,6 +77,61 @@ const ChatLab = () => {
 
   }
 
+  const handleGenerateChatStream = () => {
+    // add prompt if it is not empty
+    if (prompt.trim() == "") {
+      console.log("the prompt can't be empty string")
+      return
+    }
+
+    if (!model){
+      console.log("the model can not be empty")
+      return 
+    }
+
+    // add prompt to messages with role user
+    const m:Message = {
+      content: prompt,
+      role: "user",
+    }
+
+    setMessages(prevMessages => {
+      const updatedMessages = [...prevMessages, m]
+      const req:GenerateChatCompletionReq = {
+        model: model.name,
+        messages: updatedMessages,
+        stream: true 
+      }
+
+      setIsLoading(true)
+
+      fetchGenereateChatStream(
+        req,
+        (resp) => {
+          if !resp.done {
+            
+            const partialMessage = resp.message.content           
+            
+          } else {
+            setLastMessage("")
+            const newMessage:Message = {
+            content: content, 
+            role: "assistant"
+          }
+
+          }
+                    setIsLoading(false)
+          setMessages(prev => [...prev, newMessage])
+        },
+        (err) => console.error(err)
+      );
+
+      return updatedMessages;
+    })
+
+
+  } 
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg">
@@ -95,17 +152,23 @@ const ChatLab = () => {
         </CardContent>
 
         <CardFooter className="p-4 border-t">
-          <div className="flex w-full gap-2">
+          <div className="flex w-full gap-2 justify-between">
             <Textarea 
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Type your message..."
               disabled={isLoading}
             />
-            <Button onClick={handleSendMessage} size="icon" disabled={isLoading || !prompt.trim()}>
-              <Send className="h-4 w-4" />
-              <span className="sr-only">Send message</span>
-            </Button>
+            <div className="flex-col justify-items-center">
+              <Button onClick={handleGenerateChatStream} className="flex w-full mb-2" size={"lg"} disabled={isLoading || !prompt.trim()}>
+                <span>stream</span>
+                <span className="sr-only">Send message</span>
+              </Button>
+              <Button onClick={handleGenerateChatOnce} className="flex w-full" variant="secondary" size={"lg"} disabled={isLoading || !prompt.trim()}>
+                <span className="sr-only">Send message</span>
+                <span>once</span>
+              </Button>
+            </div>
           </div>
         </CardFooter>
       </Card>

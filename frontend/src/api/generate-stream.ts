@@ -3,6 +3,7 @@ import {
   ApiEndpoints, 
   GenerateCompletionReq,
   GenerateChatCompletionReq,
+  GenerateChatCompletionRes,
 } from './types' 
 
 export async function fetchGenereateStream (
@@ -39,7 +40,7 @@ export async function fetchGenereateStream (
 
 export async function fetchGenereateChatStream (
   requestPayload: GenerateChatCompletionReq,
-  onSuccess: (text: string) => void, 
+  onSuccess: (res: GenerateChatCompletionRes) => void, 
   onError: (error:any) => void
 ) {
   const url = ApiEndpoints.GENERATE_CHAT_STREAM
@@ -53,12 +54,7 @@ export async function fetchGenereateChatStream (
       jsonObject.forEach((element) => {
         try {
           const data = JSON.parse(element);
-          if (data.response) {
-            const text = data.response;
-            if (!text.includes("<think>") && !text.includes("</think>")) {
-              onSuccess(text);
-            }
-          }
+          onSuccess(data)
         } catch (error) {
           console.error("Failed to parse JSON error:", error);
           onError(error);
