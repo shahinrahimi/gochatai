@@ -4,7 +4,7 @@ import MessageList from "@/container/MessageList";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Bot, Send, User } from "lucide-react";
+import { Bot  } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
 import { fetchGenerateChat } from "@/api/generate";
 import SelectModel from "@/components/custom/SelectModel";
@@ -14,7 +14,6 @@ const ChatLab = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [prompt, setPrompt] = React.useState<string>("")
   const [messages, setMessages] = React.useState<Message[]>([])
-  const [lastMessage, setLastMessage] = React.useState<string>("")
 
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
@@ -48,33 +47,39 @@ const ChatLab = () => {
       content: prompt,
       role: "user",
     }
+    // feature reply or Message
+    const featuredMessage:Message = {
+      content: "",
+      role: "assistant",
+    }
 
-    setMessages(prevMessages => {
-      const updatedMessages = [...prevMessages, m]
-      const req:GenerateChatCompletionReq = {
-        model: model.name,
-        messages: updatedMessages,
-        stream: false
-      }
+    // create request before updating state
+    const req:GenerateChatCompletionReq = {
+      model: model.name,
+      messages:[...messages, m],
+      stream: false
+    }
 
-      setIsLoading(true)
+    // Update messages state immediatly
+    setMessages((prevMessages) => [...prevMessages, m, featuredMessage])
 
-      fetchGenerateChat(
-        req,
-        (content) => {
-          const newMessage:Message = {
-            content: content,
-            role: "assistant"
-          }
-          setIsLoading(false)
-          setMessages(prev => [...prev, newMessage])
-        },
-        (err) => console.error(err)
-      );
+    setIsLoading(true)
 
-      return updatedMessages;
-    })
-
+    fetchGenerateChat(
+      req,
+      (message) => {
+        setMessages(prevMessages => {
+          return prevMessages.map((em, index) => {
+            if (index == prevMessages.length - 1) {
+              return {...em, content: message}
+            }
+            return em
+          })
+        })
+        setIsLoading(false)
+      },
+      (err) => console.log(err)
+    )
   }
 
   const handleGenerateChatStream = () => {
@@ -94,42 +99,40 @@ const ChatLab = () => {
       content: prompt,
       role: "user",
     }
+    // feaure reply or Message
+    const featuredMessage:Message = {
+      content: "",
+      role: "assistant",
+    }
 
-    setMessages(prevMessages => {
-      const updatedMessages = [...prevMessages, m]
-      const req:GenerateChatCompletionReq = {
-        model: model.name,
-        messages: updatedMessages,
-        stream: true 
-      }
+    // create request before updating state
+    const req:GenerateChatCompletionReq = {
+      model: model.name,
+      messages:[...messages, m],
+      stream: true 
+    }
 
-      setIsLoading(true)
+    // Update messages state immediatly
+    setMessages((prevMessages) => [...prevMessages, m, featuredMessage])
 
-      fetchGenereateChatStream(
-        req,
-        (resp) => {
-          if !resp.done {
-            
-            const partialMessage = resp.message.content           
-            
-          } else {
-            setLastMessage("")
-            const newMessage:Message = {
-            content: content, 
-            role: "assistant"
-          }
-
-          }
-                    setIsLoading(false)
-          setMessages(prev => [...prev, newMessage])
-        },
-        (err) => console.error(err)
-      );
-
-      return updatedMessages;
-    })
-
-
+    setIsLoading(true)
+   
+    fetchGenereateChatStream(
+      req,
+      (resp) => {
+        setMessages(prevMessages => {
+          return prevMessages.map((em,index) => {
+            if (index == prevMessages.length - 1) {
+              return {...em, content: em.content + resp.message.content}
+            }
+            return em
+          })
+        })
+        if (resp.done) setIsLoading(false)
+ 
+      },
+      (err) => console.log(err)
+    )
   } 
 
   return (

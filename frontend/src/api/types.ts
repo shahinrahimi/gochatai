@@ -55,6 +55,7 @@ export type Role = "system" | "user" | "assistant" | "tool";
 
 // Define Message type
 export interface Message {
+  // feilds comming from api
   role: Role;
   content: string;
   image?: string[];

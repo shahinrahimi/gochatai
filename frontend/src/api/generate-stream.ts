@@ -50,16 +50,38 @@ export async function fetchGenereateChatStream (
     undefined,
     requestPayload,
     (chunk) => {
-      const jsonObject = chunk.trim().split("\n");
-      jsonObject.forEach((element) => {
-        try {
-          const data = JSON.parse(element);
-          onSuccess(data)
-        } catch (error) {
-          console.error("Failed to parse JSON error:", error);
-          onError(error);
+      try {
+        const trimmedChunk = chunk.trim();
+
+        // If the chink is empty or malformed, return early to avoid infinit
+        if (!trimmedChunk) {
+          return;
         }
-      })
+
+        const jsonObject = trimmedChunk.split("\n");
+        jsonObject.forEach(element => {
+          try {
+            const data = JSON.parse(element)
+            
+            if (data.done) {
+              return;
+            }
+
+            if (data) {
+              onSuccess(data)
+            } else {
+              throw new Error("failed to parse element")
+            }
+
+          } catch (parseError) {
+            console.warn("Skipping malformed JSON chunk: ", parseError ,element)
+            return
+          }
+        })
+      } catch (error) {
+        console.error("Failed to process the chunk: ", error)
+        onError(error)
+      }
     },
     onError
   ) 

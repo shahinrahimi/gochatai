@@ -1,4 +1,4 @@
-:import React from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Bot, Home, AlertCircle } from "lucide-react";
 
@@ -25,12 +25,16 @@ const NotFoundPage = () => {
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Button asChild size="lg">
+            <span>
             <Home className="mr-2 h-4 w-4" />
             <span>Back to Home</span>
+            </span>
           </Button>
-          <Button variant="outline" size="lg">
+          <Button asChild variant="outline" size="lg">
+          <span>
             <Bot className="mr-2 h-4 w-4" />
-            Start New Chat
+            <span>Start New Chat</span>
+            </span>
           </Button>
         </div>
 
