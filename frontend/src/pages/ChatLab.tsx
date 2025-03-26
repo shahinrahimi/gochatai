@@ -8,7 +8,7 @@ import { Bot  } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
 import { fetchGenerateChat } from "@/api/generate";
 import SelectModel from "@/components/custom/SelectModel";
-import { fetchGenereateChatStream } from "@/api/generate-stream";
+import { fetchGenerateChatStream } from "@/api/generate-stream";
 const ChatLab = () => {
   const [model, setModel] = React.useState<LocalModel | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
@@ -117,7 +117,7 @@ const ChatLab = () => {
 
     setIsLoading(true)
    
-    fetchGenereateChatStream(
+    fetchGenerateChatStream(
       req,
       (resp) => {
         setMessages(prevMessages => {

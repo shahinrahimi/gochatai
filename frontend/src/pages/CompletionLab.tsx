@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Bot  } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
-import { fetchGenerate } from "@/api/generate";
-import { fetchGenereateStream } from "@/api/generate-stream";
+import { fetchGenerateCompletion } from "@/api/generate";
+import { fetchGenerateCompletionStream } from "@/api/generate-stream";
 import SelectModel from "@/components/custom/SelectModel";
 const CompletionLab = () => {
   const [model, setModel] = React.useState<LocalModel | null>(null)
@@ -30,7 +30,7 @@ const CompletionLab = () => {
     }
   }
 
-  const handleGenerateChatOnce = () => {
+  const handleGenerateCompletion = () => {
     // add prompt if it is not empty
     if (prompt.trim() == "") {
       console.log("the prompt can't be empty string")
@@ -65,7 +65,7 @@ const CompletionLab = () => {
 
     setIsLoading(true)
     
-    fetchGenerate(
+    fetchGenerateCompletion(
       req,
       (message) => {
         setMessages(prevMessages => {
@@ -82,7 +82,7 @@ const CompletionLab = () => {
     )
   }
 
-  const handleGenerateChatStream = () => {
+  const handleGenerateCompletionStream = () => {
     // add prompt if it is not empty
     if (prompt.trim() == "") {
       console.log("the prompt can't be empty string")
@@ -117,17 +117,19 @@ const CompletionLab = () => {
 
     setIsLoading(true)
    
-    fetchGenereateStream(
+    fetchGenerateCompletionStream(
       req,
       (resp) => {
         setMessages(prevMessages => {
           return prevMessages.map((em,index) => {
             if (index == prevMessages.length - 1) {
-              return {...em, content: em.content + resp}
+              return {...em, content: em.content + resp.response}
             }
             return em
           })
         })
+        console.log(resp)
+        if (resp.done) setIsLoading(false)
       },
       (err) => console.log(err)
     )
@@ -161,11 +163,11 @@ const CompletionLab = () => {
               disabled={isLoading}
             />
             <div className="flex-col justify-items-center">
-              <Button onClick={handleGenerateChatStream} className="flex w-full mb-2" size={"lg"} disabled={isLoading || !prompt.trim()}>
+              <Button onClick={handleGenerateCompletionStream} className="flex w-full mb-2" size={"lg"} disabled={isLoading || !prompt.trim()}>
                 <span>stream</span>
                 <span className="sr-only">Send message</span>
               </Button>
-              <Button onClick={handleGenerateChatOnce} className="flex w-full" variant="secondary" size={"lg"} disabled={isLoading || !prompt.trim()}>
+              <Button onClick={handleGenerateCompletion} className="flex w-full" variant="secondary" size={"lg"} disabled={isLoading || !prompt.trim()}>
                 <span className="sr-only">Send message</span>
                 <span>once</span>
               </Button>

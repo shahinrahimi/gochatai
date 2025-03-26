@@ -7,7 +7,7 @@ import {
 } from "@/api/types"
 import apiClient from "./api"
 
-export async function fetchGenerate(
+export async function fetchGenerateCompletion(
   payload: GenerateCompletionReq,
   onSuccess: (message: string) => void,
   onError: (err: any) => void

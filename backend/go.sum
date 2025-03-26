@@ -21,6 +21,8 @@ github.com/shahinrahimi/ollamalite v0.0.0-20250319121848-f73d2cbf2626 h1:M9LdIid
 github.com/shahinrahimi/ollamalite v0.0.0-20250319121848-f73d2cbf2626/go.mod h1:HqH+JTikZqK+A41ULp9Uiqj6fd/X8IHPbHTjsHN/iMU=
 github.com/shahinrahimi/ollamalite v0.0.0-20250319134010-64dd62d3afbf h1:qMaf9l+UV9pfXX1/UBYvEvCDzJJpeMB7/N6v/I1FOZg=
 github.com/shahinrahimi/ollamalite v0.0.0-20250319134010-64dd62d3afbf/go.mod h1:HqH+JTikZqK+A41ULp9Uiqj6fd/X8IHPbHTjsHN/iMU=
+github.com/shahinrahimi/ollamalite v0.0.0-20250326174238-09563aab6721 h1:fo4dJYSWGOo6oQd8fmKkmdtod4ZJ4ZwJvInxVaZN4e8=
+github.com/shahinrahimi/ollamalite v0.0.0-20250326174238-09563aab6721/go.mod h1:HqH+JTikZqK+A41ULp9Uiqj6fd/X8IHPbHTjsHN/iMU=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
 github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

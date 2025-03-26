@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './pages/Layout'
-import Chat from '@/pages/Chat'
 import ChatLab from '@/pages/ChatLab'
 import CompletionLab from '@/pages/CompletionLab'
 import HomePage from '@/pages/HomePage'
@@ -12,7 +11,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />} >
         <Route index element={<HomePage />} />
-        <Route path="chat" element={<Chat />} />
+        <Route path="chat" element={<ChatLab />} />
       </Route>
       <Route path="/chat-lab" element={<ChatLab />} />
       <Route path="/completion-lab" element={<CompletionLab />} />
