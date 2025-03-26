@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/shahinrahimi/ollamalite/ollama"
@@ -50,66 +47,6 @@ func (app *Application)GenerateChatCompletion(w http.ResponseWriter, r*http.Requ
   })
 }
 
-func (app *Application) GenerateCompletionSSE (w http.ResponseWriter, r*http.Request) error {
-  ctx := r.Context()
-  w.Header().Set("Content-Type", "json/application")
-  w.Header().Set("Cashe-Control", "no-cache")
-  w.Header().Set("Connection", "keep-alive")
-  w.Header().Set("Transfer-Encoding", "chunked")
-  flusher, ok := w.(http.Flusher)
-  if !ok{
-    return ErrorJSON(w, errors.New("flusher is not ok!"))
-  }
-  var oReq ollama.GenerateCompletionReq
-  if err := ReadJSON(w, r, &oReq); err != nil {
-    return ErrorJSON(w,err)
-  }
-
-  outCh, errCh := app.oc.GenerateCompletionSSE(ctx, oReq)
-  for {
-    select {
-    case chunk, _ := <-outCh:
-      data, _ := json.Marshal(chunk)
-      fmt.Fprintln(w, string(data))
-      flusher.Flush()
-    
-    case err, _ := <-errCh:
-      return ErrorJSON(w, fmt.Errorf("Streaming error: %w", err))
-    }
-  }
-
-
-}
-func (app *Application) GenerateChatCompletionSSE (w http.ResponseWriter, r*http.Request) error {
-  ctx := r.Context()
-  w.Header().Set("Content-Type", "json/application")
-  w.Header().Set("Cashe-Control", "no-cache")
-  w.Header().Set("Connection", "keep-alive")
-  w.Header().Set("Transfer-Encoding", "chunked")
-  flusher, ok := w.(http.Flusher)
-  if !ok{
-    return ErrorJSON(w, errors.New("flusher is not ok!"))
-  }
-  var oReq ollama.GenerateChatCompletionReq
-  if err := ReadJSON(w, r, &oReq); err != nil {
-    return ErrorJSON(w,err)
-  }
-
-  outCh, errCh := app.oc.GenerateChatCompletionSSE(ctx, oReq)
-  for {
-    select {
-    case chunk, _ := <-outCh:
-      data, _ := json.Marshal(chunk)
-      fmt.Fprintln(w, string(data))
-      flusher.Flush()
-    
-    case err, _ := <-errCh:
-      return ErrorJSON(w, fmt.Errorf("Streaming error: %w", err))
-    }
-  }
-
-
-}
 
 
 func(app *Application) ListLocalModels(w http.ResponseWriter, r*http.Request) error {

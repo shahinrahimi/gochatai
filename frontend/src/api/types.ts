@@ -8,6 +8,15 @@ export enum ApiEndpoints {
   GENERATE_CHAT_STREAM = "/chat-stream",
 }
 
+export type ApiResponse = {
+  Error: boolean,
+  Message: string,
+  Data: any
+}
+// api middleware types
+export type RequestMiddleware = (request: RequestInit, url: string) => Promise<void>;
+export type ResponseMiddleware = (response: Response, url: string) => Promise<Response>;
+
 // Define the Options type
 export interface Options {
   seed?: number;
@@ -46,6 +55,7 @@ export type Role = "system" | "user" | "assistant" | "tool";
 
 // Define Message type
 export interface Message {
+  // feilds comming from api
   role: Role;
   content: string;
   image?: string[];

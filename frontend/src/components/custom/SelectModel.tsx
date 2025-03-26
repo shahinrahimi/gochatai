@@ -7,19 +7,19 @@ import {
   SelectTrigger,
   SelectValue
 } from '../ui/select'
-import { Model } from "@/types";
-import { fetchLocalModels as fetchModels } from "@/api";
-const modelSignal = signal<Model | null>(null)
-const modelsSignal = signal<Model[]>([])
+import { LocalModel } from "@/api/types";
+import { fetchLocalModels } from "@/api/models";
+const modelSignal = signal<LocalModel | null>(null)
+const modelsSignal = signal<LocalModel[]>([])
 
 interface SelectModelProps {
-  onFetchComplete: (defaultModel: Model | null) => void
+  onFetchComplete: (defaultModel: LocalModel | null) => void
 }
 const SelectModel = ({onFetchComplete}: SelectModelProps) => {
   
   React.useEffect(() => {
     const handleFetchModels = async () => {
-      await fetchModels((ms) => {
+      await fetchLocalModels((ms) => {
         if (ms.length > 0) {
           modelsSignal.value = ms 
           modelSignal.value = ms[0]
@@ -32,7 +32,7 @@ const SelectModel = ({onFetchComplete}: SelectModelProps) => {
   },[]) 
 
   const handleModelChange = (modelName: string) => {
-    modelsSignal.value.forEach((m:Model) => {
+    modelsSignal.value.forEach((m:LocalModel) => {
       if (m.name == modelName) {
         modelSignal.value = m
         onFetchComplete(m)
@@ -46,7 +46,7 @@ const SelectModel = ({onFetchComplete}: SelectModelProps) => {
       </SelectTrigger>
         {modelsSignal.value.length > 0 && (
           <SelectContent >
-          {modelsSignal.value.map((m: Model) => (
+          {modelsSignal.value.map((m: LocalModel) => (
             <SelectItem key={m.name} value={m.name}>
               {m.name}
             </SelectItem>
