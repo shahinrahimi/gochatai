@@ -1,5 +1,5 @@
 import React from "react";
-import { GenerateCompletionReq, LocalModel, Message } from "@/api/types";
+import { GenerateCompletionReq, Message } from "@/api/types";
 import MessageList from "@/container/MessageList";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -9,27 +9,31 @@ import LoadingThreedot from "@/components/custom/LoadingThreedot";
 import { fetchGenerateCompletion } from "@/api/generate";
 import { fetchGenerateCompletionStream } from "@/api/generate-stream";
 import SelectModel from "@/components/custom/SelectModel";
+import { useLocalModel, useRunningModel } from "@/hooks/useModels";
 const CompletionLab = () => {
-  const [model, setModel] = React.useState<LocalModel | null>(null)
+  const {model, models, setModel} = useLocalModel("completion-lab")
+  const {models:runningModels, refetch} = useRunningModel()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [prompt, setPrompt] = React.useState<string>("")
   const [messages, setMessages] = React.useState<Message[]>([])
 
-  const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
+  const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  
+  React.useEffect(() => {
+    refetch()
+    if (runningModels.length>0){
+      console.log(runningModels)
+    }
+
+  },[model])
   // Auto-scroll to bottom when messages change
   React.useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({behavior: "smooth"})
     }
   },[messages])
-  const handleOnListModelComplete = (m: LocalModel | null) => {
-    if (m) {
-      setModel(m)
-      console.log("model set to: ", m.name)
-    }
-  }
-
+  
   const handleGenerateCompletion = () => {
     // add prompt if it is not empty
     if (prompt.trim() == "") {
@@ -128,7 +132,6 @@ const CompletionLab = () => {
             return em
           })
         })
-        console.log(resp)
         if (resp.done) setIsLoading(false)
       },
       (err) => console.log(err)
@@ -141,7 +144,11 @@ const CompletionLab = () => {
         <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
-            <SelectModel onFetchComplete={handleOnListModelComplete}/>
+            <SelectModel 
+              models={models}
+              setModel={setModel}
+              model={model}
+            />
             AI Assistant
           </CardTitle>
         </CardHeader>

@@ -1,5 +1,4 @@
 import React from "react";
-import { signal } from "@preact/signals-react";
 import { 
   Select,
   SelectItem,
@@ -8,45 +7,28 @@ import {
   SelectValue
 } from '../ui/select'
 import { LocalModel } from "@/api/types";
-import { fetchLocalModels } from "@/api/models";
-const modelSignal = signal<LocalModel | null>(null)
-const modelsSignal = signal<LocalModel[]>([])
+
 
 interface SelectModelProps {
-  onFetchComplete: (defaultModel: LocalModel | null) => void
+  model: LocalModel | null,
+  models: LocalModel[],
+  setModel: (Model: LocalModel) => void; 
 }
-const SelectModel = ({onFetchComplete}: SelectModelProps) => {
-  
-  React.useEffect(() => {
-    const handleFetchModels = async () => {
-      await fetchLocalModels((ms) => {
-        if (ms.length > 0) {
-          modelsSignal.value = ms 
-          modelSignal.value = ms[0]
-          onFetchComplete(ms[0])
-        }
-      },(err: any) => {
-        console.log("Error in fethcing models list: ", err)
-      })} 
-    handleFetchModels()
-  },[]) 
+const SelectModel = ({model, models, setModel}:SelectModelProps) => {
+    const handleChangeValue = (value:string) => {
+      models.forEach((me:LocalModel) => {
+        if (me.name == value) setModel(me)
+      })
+    } 
 
-  const handleModelChange = (modelName: string) => {
-    modelsSignal.value.forEach((m:LocalModel) => {
-      if (m.name == modelName) {
-        modelSignal.value = m
-        onFetchComplete(m)
-      }
-    })
-  }
-  return (
-    <Select onValueChange={(value) => handleModelChange(value)}>
+    return (
+    <Select value={model?.name} onValueChange={(value) => handleChangeValue(value)}>
       <SelectTrigger className="w-[280px]">
-        <SelectValue placeholder="select a model" />
+        <SelectValue placeholder="Select a model" />
       </SelectTrigger>
-        {modelsSignal.value.length > 0 && (
+        {models.length > 0 && (
           <SelectContent >
-          {modelsSignal.value.map((m: LocalModel) => (
+          {models.map((m: LocalModel) => (
             <SelectItem key={m.name} value={m.name}>
               {m.name}
             </SelectItem>
@@ -54,8 +36,6 @@ const SelectModel = ({onFetchComplete}: SelectModelProps) => {
           </SelectContent>
         )}
     </Select>
-    
-
   )
 }
 
