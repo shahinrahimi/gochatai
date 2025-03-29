@@ -4,7 +4,7 @@ import { LocalModel, RunningModel} from "@/api/types"
 import { usePersistentState } from "@/hooks/usePersistantState"
 import { fetchLocalModels, fetchRunningModels } from "@/api/models";
 
-export function useLocalModel(storageKey: string = "selectedLocalModel") {
+export function useLocalModel(storageKey: string) {
   const [model, setModel] = usePersistentState<LocalModel | null>(storageKey, null); 
   const [models, setModels] = React.useState<LocalModel[]>([])
 
