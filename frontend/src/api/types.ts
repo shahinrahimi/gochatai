@@ -63,7 +63,7 @@ export interface Message {
 }
 
 // Define GenerateChatCompletionReq
-export interface GenerateChatCompletionReq {
+export interface GenerateChatReq {
   model: string;
   messages: Message[];
   tools?: string[];
@@ -73,7 +73,7 @@ export interface GenerateChatCompletionReq {
 }
 
 // Define GenerateChatCompletionRes
-export interface GenerateChatCompletionRes {
+export interface GenerateChatRes {
   model: string;
   created_at: string;
   message: Message;
