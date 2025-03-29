@@ -1,185 +1,105 @@
+
 import React from "react";
-import { GenerateChatCompletionReq, LocalModel, Message } from "@/api/types";
 import MessageList from "@/container/MessageList";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Bot  } from "lucide-react";
-import LoadingThreedot from "@/components/custom/LoadingThreedot";
-import { fetchGenerateChat } from "@/api/generate";
+import { Switch } from "@/components/ui/switch"
+import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 import SelectModel from "@/components/custom/SelectModel";
-import { fetchGenerateChatStream } from "@/api/generate-stream";
+import { useLocalModel } from "@/hooks/useModels";
+import { useChat } from "@/hooks/useChat";
+import { Bot } from "lucide-react";
+import LoadingThreedot from "@/components/custom/LoadingThreedot";
 const ChatLab = () => {
-  const [model, setModel] = React.useState<LocalModel | null>(null)
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [prompt, setPrompt] = React.useState<string>("")
-  const [messages, setMessages] = React.useState<Message[]>([])
+  const [showAdvanced, setShowAdvanced] = React.useState<boolean>(false)
+
+  const {model, models, setModel} = useLocalModel("completion-lab")
+  const {
+    messages,
+    isLoading,
+    handleSubmit,
+    input,
+    setInput,
+  } = useChat(model)
 
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
-  // Auto-scroll to bottom when messages change
+    // Auto-scroll to bottom when messages change
   React.useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({behavior: "smooth"})
     }
   },[messages])
-  const handleOnListModelComplete = (m: LocalModel | null) => {
-    if (m) {
-      setModel(m)
-      console.log("model set to: ", m.name)
-    }
-  }
 
-  const handleGenerateChatOnce = () => {
-    // add prompt if it is not empty
-    if (prompt.trim() == "") {
-      console.log("the prompt can't be empty string")
-      return
-    }
-
-    if (!model){
-      console.log("the model can not be empty")
-      return 
-    }
-
-    // add prompt to messages with role user
-    const m:Message = {
-      content: prompt,
-      role: "user",
-    }
-    // feature reply or Message
-    const featuredMessage:Message = {
-      content: "",
-      role: "assistant",
-    }
-
-    // create request before updating state
-    const req:GenerateChatCompletionReq = {
-      model: model.name,
-      messages:[...messages, m],
-      stream: false
-    }
-
-    // Update messages state immediatly
-    setMessages((prevMessages) => [...prevMessages, m, featuredMessage])
-
-    setIsLoading(true)
-
-    fetchGenerateChat(
-      req,
-      (message) => {
-        setMessages(prevMessages => {
-          return prevMessages.map((em, index) => {
-            if (index == prevMessages.length - 1) {
-              return {...em, content: message}
-            }
-            return em
-          })
-        })
-        setIsLoading(false)
-      },
-      (err) => console.log(err)
-    )
-  }
-
-  const handleGenerateChatStream = () => {
-    // add prompt if it is not empty
-    if (prompt.trim() == "") {
-      console.log("the prompt can't be empty string")
-      return
-    }
-
-    if (!model){
-      console.log("the model can not be empty")
-      return 
-    }
-
-    // add prompt to messages with role user
-    const m:Message = {
-      content: prompt,
-      role: "user",
-    }
-    // feaure reply or Message
-    const featuredMessage:Message = {
-      content: "",
-      role: "assistant",
-    }
-
-    // create request before updating state
-    const req:GenerateChatCompletionReq = {
-      model: model.name,
-      messages:[...messages, m],
-      stream: true 
-    }
-
-    // Update messages state immediatly
-    setMessages((prevMessages) => [...prevMessages, m, featuredMessage])
-
-    setIsLoading(true)
    
-    fetchGenerateChatStream(
-      req,
-      (resp) => {
-        setMessages(prevMessages => {
-          return prevMessages.map((em,index) => {
-            if (index == prevMessages.length - 1) {
-              return {...em, content: em.content + resp.message.content}
-            }
-            return em
-          })
-        })
-        if (resp.done) setIsLoading(false)
+  const handleFormSubmit = (e: React.FormEvent) => {
+    //setPrompt("");
+    handleSubmit(e);
+  }
+  
  
-      },
-      (err) => console.log(err)
-    )
-  } 
-
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gray-50">
-      <Card className="w-full max-w-7xl shadow-lg">
-        <CardHeader className="border-b">
-          <CardTitle className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-primary" />
-            <SelectModel onFetchComplete={handleOnListModelComplete}/>
-            AI Assistant
-          </CardTitle>
-        </CardHeader>
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
+      {/* Settings Panel */}
+      <div
+        className={`${showAdvanced ? "w-full md:w-1/4 p-4 opacity-100" : "w-0 p-0 opacity-0"} transition-all duration-300 overflow-hidden bg-white border-r`}
+      >
+        <div className="space-y-6">
+          <h2 className="text-xl font-bold">Advanced Settings</h2>
 
-        <CardContent className="p-0">
-          <div className="h-[60vh] overflow-y-auto p-4 space-y-4">
-          <MessageList messages={messages} />
-          {isLoading && <LoadingThreedot />}
-          <div ref={messagesEndRef} />
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Model</label>
+            <SelectModel model={model} setModel={setModel} models={models} />
           </div>
-        </CardContent>
 
-        <CardFooter className="p-4 border-t">
-          <div className="flex w-full gap-2 justify-between">
-            <Textarea 
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+        </div>
+      </div>
+
+      {/* Chat Interface */}
+      <div className={`flex-1 flex flex-col ${showAdvanced ? "md:w-2/3" : "w-full"} transition-all duration-300`}>
+        {/* Header */}
+        <header className="p-4 border-b flex justify-between items-center bg-white">
+          <h1 className="flex text-xl justify-center align-baseline gap-4">
+            <span className=""><Bot /></span>
+            <span className="">{model?.name}</span>
+            {isLoading && <span className="flex justify-center items-center"><LoadingThreedot /></span>}
+          </h1>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Advanced Mode</span>
+            <Switch checked={showAdvanced} onCheckedChange={setShowAdvanced} />
+          </div>
+        </header>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="max-w-7xl mx-auto">
+          <MessageList messages={messages} />
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="p-4 border-t bg-white">
+          <form onSubmit={handleFormSubmit} className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
+              className="flex-1"
               disabled={isLoading}
             />
-            <div className="flex-col justify-items-center">
-              <Button onClick={handleGenerateChatStream} className="flex w-full mb-2" size={"lg"} disabled={isLoading || !prompt.trim()}>
-                <span>stream</span>
-                <span className="sr-only">Send message</span>
-              </Button>
-              <Button onClick={handleGenerateChatOnce} className="flex w-full" variant="secondary" size={"lg"} disabled={isLoading || !prompt.trim()}>
-                <span className="sr-only">Send message</span>
-                <span>once</span>
-              </Button>
-            </div>
-          </div>
-        </CardFooter>
-      </Card>
-    </div>  )
+            <Button type="submit" disabled={isLoading || !input.trim()}>
+              {isLoading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+
 }
 
-
 export default ChatLab;
-
-
-

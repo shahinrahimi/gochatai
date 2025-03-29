@@ -1,30 +1,27 @@
+
 import React from "react"
-import { Message, GenerateCompletionReq } from "@/api/types"
-import { fetchGenerateCompletionStream } from "@/api/generate-stream"
-export function useCompletion(reqPayload: GenerateCompletionReq){  
+import { Message, GenerateChatReq, LocalModel } from "@/api/types"
+import { fetchGenerateChatStream } from "@/api/generate-stream"
+export function useChat(model: LocalModel | null){  
    const [messages, setMessages] = React.useState<Message[]>([])
-   const [req, setReq] = React.useState<GenerateCompletionReq>(reqPayload)
+   const [input, setInput] = React.useState<string>("")
    const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
-   const handleSubmit = (e:any) => {
+   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault()
-    if (!req) {
-      console.log("the req can not be undefined")
-      return
-    }
-    if (req.prompt.trim() == "") {
+    if (input.trim() == "") {
       console.log("the prompt can't be empty string")
       return
     }
 
-    if (!req.model){
+    if (!model){
       console.log("useCompletion: the model can not be empty")
       return 
     }
 
     // add prompt to messages with role user
     const m:Message = {
-      content: req.prompt,
+      content: input,
       role: "user",
     }
     // feaure reply or Message
@@ -32,24 +29,32 @@ export function useCompletion(reqPayload: GenerateCompletionReq){
       content: "",
       role: "assistant",
     }
+    
+    // ceate requet before updating state
+    const req: GenerateChatReq = {
+      model:model.name,
+      messages: [...messages, m],
+      stream: true,
+    }
 
     
     // Update messages state immediatly
-    setMessages((prevMessages) => [...prevMessages, m, featuredMessage])
+    setMessages((prevMessages) => [...prevMessages,m,featuredMessage])
 
     setIsLoading(true)
    
-    fetchGenerateCompletionStream(
+    fetchGenerateChatStream(
       req,
       (resp) => {
         setMessages(prevMessages => {
           return prevMessages.map((em,index) => {
             if (index == prevMessages.length - 1) {
-              return {...em, content: em.content + resp.response}
+              return {...em, content: em.content + resp.message.content}
             }
             return em
           })
         })
+        console.log(resp)
         if (resp.done) setIsLoading(false)
       },
       (err) => console.log(err)
@@ -60,7 +65,8 @@ export function useCompletion(reqPayload: GenerateCompletionReq){
 
    return {
      messages,
-     setReq,
+     input,
+     setInput,
      handleSubmit,
      isLoading
    }
