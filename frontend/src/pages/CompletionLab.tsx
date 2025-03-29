@@ -26,7 +26,7 @@ const CompletionLab = () => {
     isLoading,
     setReq,
     handleSubmit,
-  } = useCompletion("", {
+  } = useCompletion({
     prompt: prompt,
     system: systemPrompt,
     model: model ? model.name : "",
