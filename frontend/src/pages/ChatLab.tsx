@@ -2,7 +2,6 @@
 import React from "react";
 import MessageList from "@/container/MessageList";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import SelectModel from "@/components/custom/SelectModel";
@@ -10,8 +9,8 @@ import { useLocalModel } from "@/hooks/useModels";
 import { useChat } from "@/hooks/useChat";
 import { Bot } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 const ChatLab = () => {
-  const [showAdvanced, setShowAdvanced] = React.useState<boolean>(false)
 
   const {model, models, setModel} = useLocalModel("completion-lab")
   const {
@@ -39,36 +38,22 @@ const ChatLab = () => {
   
  
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
-      {/* Settings Panel */}
-      <div
-        className={`${showAdvanced ? "w-full md:w-1/4 p-4 opacity-100" : "w-0 p-0 opacity-0"} transition-all duration-300 overflow-hidden bg-white border-r`}
-      >
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold">Advanced Settings</h2>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Model</label>
-            <SelectModel model={model} setModel={setModel} models={models} />
-          </div>
-
-        </div>
-      </div>
-
-      {/* Chat Interface */}
-      <div className={`flex-1 flex flex-col ${showAdvanced ? "md:w-2/3" : "w-full"} transition-all duration-300`}>
+    <div className="flex flex-col h-screen bg-gray-50">
         {/* Header */}
         <header className="p-4 border-b flex justify-between items-center bg-white">
-          <h1 className="flex text-xl justify-center align-baseline gap-4">
-            <span className=""><Bot /></span>
-            <span className="">{model?.name}</span>
-            {isLoading && <span className="flex justify-center items-center"><LoadingThreedot /></span>}
+          <SidebarTrigger />
+          <h1 className="flex flex-row-reverse text-xl justify-center items-center gap-4">
+              <span>
+                <Bot size={40} />
+                <LoadingThreedot loading={isLoading} />
+              </span>
+              <SelectModel 
+                  model={model} 
+                  setModel={setModel} 
+                  models={models} 
+              />
           </h1>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Advanced Mode</span>
-            <Switch checked={showAdvanced} onCheckedChange={setShowAdvanced} />
-          </div>
-        </header>
+      </header>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -96,7 +81,6 @@ const ChatLab = () => {
             </Button>
           </form>
         </div>
-      </div>
     </div>
   )
 

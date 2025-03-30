@@ -23,7 +23,7 @@ const SelectModel = ({model, models, setModel}:SelectModelProps) => {
 
     return (
     <Select value={model?.name} onValueChange={(value) => handleChangeValue(value)}>
-      <SelectTrigger className="w-[280px]">
+      <SelectTrigger className="w-[280px] border-none">
         <SelectValue placeholder="Select a model" />
       </SelectTrigger>
         {models.length > 0 && (
