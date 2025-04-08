@@ -23,11 +23,15 @@ export function useChat(model: LocalModel | null){
     const m:Message = {
       content: input,
       role: "user",
+      created_at: Date.now(),
+      updated_at: Date.now()
     }
     // feaure reply or Message
     const featuredMessage:Message = {
       content: "",
       role: "assistant",
+      created_at: Date.now(),
+      updated_at: Date.now()
     }
     
     // ceate requet before updating state
