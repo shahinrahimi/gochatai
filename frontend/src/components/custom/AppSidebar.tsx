@@ -8,14 +8,23 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter
 } from "@/components/ui/sidebar"
 import { Conversation } from "@/api/types";
 import { useConversation } from "@/context/ConversationContext";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
-  const {conversations} = useConversation()
+  const navigate = useNavigate()
+  const {conversations, clearConverstaions} = useConversation()
+  const handleClearConveration = () => {
+    clearConverstaions()
+    navigate("/chat")
+  }
+  const handleNewConveration = () => {
+    navigate("/chat")
+  }
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -53,6 +62,14 @@ const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenuButton className="bg-green-200 capitalize" onClick={handleNewConveration}>
+          new converastion 
+        </SidebarMenuButton>
+        <SidebarMenuButton className="bg-orange-200 capitalize" onClick={handleClearConveration}>
+          clear converastion 
+        </SidebarMenuButton>
+      </SidebarFooter>
     </Sidebar>
   )
 }
