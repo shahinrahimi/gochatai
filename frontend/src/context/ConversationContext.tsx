@@ -2,7 +2,8 @@ import React from "react"
 import {v4 as uuidv4} from "uuid"
 import  {Message, Conversation }from "@/api/types";
 import { fetchGenerateChatStream } from "@/api/generate-stream";
-import { GenerateChatReq } from "@/api/types";
+import { GenerateChatReq, GenerateCompletionReq } from "@/api/types";
+import { fetchGenerateCompletion } from "@/api/generate";
 
 const STORAGE_KEY = "chat-conversations";
 
@@ -37,6 +38,7 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
 
   React.useEffect(() => {
     if (conversations.length > 0) {
+      // filter new conversations that is not have any messages
       const conversationsToSave  = conversations.filter((c:Conversation) => c.messages.length > 0)
       localStorage.setItem("chat-conversations", JSON.stringify(conversationsToSave));
     }
@@ -44,6 +46,14 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
   
   const getCurrentConversation = ():Conversation | null => {
     return conversations.find((c:Conversation) => c.id === currentId) || null;
+  }
+
+  const renameConverstation = (id:string, newTitle: string) => {
+    setConversations((prevConvs) =>
+      prevConvs.map((c) =>
+        c.id === id ? { ...c, title: newTitle, updated_at: Date.now() } : c
+      )
+    );
   }
 
   const createConversation = (title = "New Chat"):string => {
@@ -115,7 +125,10 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
       created_at: Date.now(),
       updated_at: Date.now()
     }
-    // feaure reply or Message
+
+
+    // specify the title
+        // feaure reply or Message
     const featuredMessage:Message = {
       content: "",
       role: "assistant",
@@ -124,11 +137,29 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     }
     
     let conv = getCurrentConversation()
-    // create a new conversation if there is no conversation
-    if (!conv) {
-      createConversation("New Chat 1212");
-      conv = getCurrentConversation()
+    if (conv?.messages.length === 0) {
+      const reqTitle :GenerateCompletionReq = {
+        system : "You're a tool, that receives an input and responds exclusively with a 2-5 word summary of the topic (and absolutely no prose) based specifically on the words used in the input (not the expected output). Each word in the summary should be carefully chosen so that it's perfecly informative - and serve as a perfect title for the input. Now, return the summary for the following input",
+        prompt: input,
+        model: model,
+        stream: false,
+      }
+
+
+    fetchGenerateCompletion(
+      reqTitle,
+      (resp) => {
+        if (currentId) {
+          renameConverstation(currentId, resp) 
+        }
+      },
+      (error) => console.log(error)
+    )
+
     }
+    
+    // create a new conversation if there is no conversation
+
     const req: GenerateChatReq = {
       model:model,
       messages: [...(conv?.messages ?? []), m],
@@ -138,6 +169,7 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     addMessageToCurrent(m)
     addMessageToCurrent(featuredMessage)
     setInput("")
+    setIsLoading(true)
    
     fetchGenerateChatStream(
       req,
