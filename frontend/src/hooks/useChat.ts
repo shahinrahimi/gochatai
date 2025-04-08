@@ -2,8 +2,14 @@
 import React from "react"
 import { Message, GenerateChatReq, LocalModel } from "@/api/types"
 import { fetchGenerateChatStream } from "@/api/generate-stream"
-export function useChat(model: LocalModel | null){  
-   const [messages, setMessages] = React.useState<Message[]>([])
+import { useConversation } from "@/context/ConversationContext"
+export function useChat(model: LocalModel | null) {
+    const {
+      getCurrentConversation,
+      createConversation,
+      addMessageToCurrent,
+      updateLastAssistantMessage,
+    } = useConversation()
    const [input, setInput] = React.useState<string>("")
    const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
@@ -34,41 +40,39 @@ export function useChat(model: LocalModel | null){
       updated_at: Date.now()
     }
     
-    // ceate requet before updating state
+    // ceate request before updating state
+    let conv = getCurrentConversation()
+    if (!conv) {
+      createConversation("New Chat");
+      conv = getCurrentConversation()
+    }
     const req: GenerateChatReq = {
       model:model.name,
-      messages: [...messages, m],
+      messages: [...(conv?.messages ?? []), m],
       stream: true,
     }
 
-    
-    // Update messages state immediatly
-    setMessages((prevMessages) => [...prevMessages,m,featuredMessage])
-
-    setIsLoading(true)
+    addMessageToCurrent(m)
+    addMessageToCurrent(featuredMessage)
+    setInput("")
    
     fetchGenerateChatStream(
       req,
       (resp) => {
-        setMessages(prevMessages => {
-          return prevMessages.map((em,index) => {
-            if (index == prevMessages.length - 1) {
-              return {...em, content: em.content + resp.message.content}
-            }
-            return em
-          })
-        })
-        console.log(resp)
+        updateLastAssistantMessage(resp.message.content)
         if (resp.done) setIsLoading(false)
       },
-      (err) => console.log(err)
+      (err) => {
+        console.log(err)
+        setIsLoading(false)
+      }
     )  
   
    }
 
 
    return {
-     messages,
+     messages: getCurrentConversation()?.messages ?? [],
      input,
      setInput,
      handleSubmit,

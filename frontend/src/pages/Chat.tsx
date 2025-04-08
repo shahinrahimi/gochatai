@@ -1,4 +1,3 @@
-
 import React from "react";
 import MessageList from "@/container/MessageList";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,12 @@ import { Bot } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useConversation } from "@/context/ConversationContext";
-const ChatLab = () => {
+import { useParams, useNavigate } from "react-router-dom";
+const Chat = () => {
+  
+  const navigate = useNavigate()
+  const { id } = useParams<{id:string}>()
+  
 
   const {model, models, setModel} = useLocalModel("completion-lab")
   
@@ -19,18 +23,22 @@ const ChatLab = () => {
     setInput,
     handleSubmit,
     isLoading,
+    createConversation,
     currentConversation,
-
+    setCurrentId,
   } = useConversation()
 
-  const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  const hasCreatedRef = React.useRef(false)
 
-    // Auto-scroll to bottom when messages change
-  // React.useEffect(() => {
-  //   if (messagesEndRef.current) {
-  //     messagesEndRef.current.scrollIntoView({behavior: "smooth"})
-  //   }
-  // },[messages])
+  React.useEffect(() => {
+    if (!id && !hasCreatedRef.current) {
+      hasCreatedRef.current = true // block recreate new chat
+      const newId = createConversation("New Chat") 
+      navigate(`/chat/${newId}`)
+    } else if (id) {
+      setCurrentId(id)
+    }
+  },[id])
 
    
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -38,8 +46,12 @@ const ChatLab = () => {
       handleSubmit(e, model.name);
     }
   }
+
+  if (!currentConversation) {
+    return <div className="p-4">Conversation not found.</div>
+  }
+
   
- 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
         {/* Header */}
@@ -94,4 +106,4 @@ const ChatLab = () => {
 
 }
 
-export default ChatLab;
+export default Chat;

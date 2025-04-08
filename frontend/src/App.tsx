@@ -1,9 +1,11 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './pages/Layout'
 import ChatLab from '@/pages/ChatLab'
+import Chat from '@/pages/Chat'
 import CompletionLab from '@/pages/CompletionLab'
 import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
+
 
 import './App.css'
 function App() {
@@ -11,7 +13,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />} >
         <Route index element={<HomePage />} />
-        <Route path="chat" element={<ChatLab />} />
+        <Route path="chat" element={<Chat />} />
+        <Route path="chat/:id" element={<Chat />} />
         <Route path="completion" element={<CompletionLab />} />
       </Route>
       <Route path="/chat-lab" element={<ChatLab />} />

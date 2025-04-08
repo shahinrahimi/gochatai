@@ -175,8 +175,9 @@ export interface ChatCompletionSSERes {
 
 // types that use for persistant state
 export interface Conversation {
+  id: string;
   title: string;
   messages: Message[]
-  created_at: Date;
-  updated_at: Date;
+  created_at: number;
+  updated_at: number;
 }
