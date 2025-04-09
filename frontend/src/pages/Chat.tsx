@@ -7,15 +7,17 @@ import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
 import { Bot } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useConversation } from "@/context/ConversationContext";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSidebar } from "@/components/ui/sidebar";
+import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
+import NewConversationButton from "@/components/custom/NewConverstaionButton";
 const Chat = () => {
   
   const navigate = useNavigate()
   const { id } = useParams<{id:string}>()
+  const {open } = useSidebar()
   
-
   const {model, models, setModel} = useLocalModel("completion-lab")
   
   const {
@@ -54,19 +56,26 @@ const Chat = () => {
   
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-        {/* Header */}
-        <header className="p-4 border-b flex justify-between items-center bg-white">
-          <SidebarTrigger />
+        <header className="p-4 border-b flex justify-between items-center ">
+          <div className="flex gap-2">
+            {!open &&  (
+              <div className="flex gap-2">
+              <SidebarButtonTrigger />
+              <NewConversationButton />
+              </div>
+            )}
+            <SelectModel 
+              model={model} 
+              setModel={setModel} 
+              models={models} 
+            />
+            
+          </div>
           <h1 className="flex flex-row-reverse text-xl justify-center items-center gap-4">
               <span>
                 <Bot size={40} />
                 <LoadingThreedot loading={isLoading} />
               </span>
-              <SelectModel 
-                  model={model} 
-                  setModel={setModel} 
-                  models={models} 
-              />
           </h1>
       </header>
 
@@ -82,7 +91,6 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Input */}
         <div className="p-4 border-t bg-white">
           <form onSubmit={handleFormSubmit} className="flex gap-2">
             <Input
