@@ -37,11 +37,9 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    if (conversations.length > 0) {
-      // filter new conversations that is not have any messages
-      const conversationsToSave  = conversations.filter((c:Conversation) => c.messages.length > 0)
-      localStorage.setItem("chat-conversations", JSON.stringify(conversationsToSave));
-    }
+    // filter new conversations that is not have any messages
+    const conversationsToSave  = conversations.filter((c:Conversation) => c.messages.length > 0)
+    localStorage.setItem("chat-conversations", JSON.stringify(conversationsToSave));
   },[conversations])
   
   const getCurrentConversation = ():Conversation | null => {
