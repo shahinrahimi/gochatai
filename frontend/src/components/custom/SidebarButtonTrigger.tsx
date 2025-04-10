@@ -1,13 +1,13 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { MenuSquareIcon } from "lucide-react";
-
+import IconButton from "../IconButton";
 
 const SidebarButtonTrigger = () => {
   const {open, setOpen} = useSidebar()
   return (
-    <button onClick={() => setOpen(!open)}>
+    <IconButton onClick={() => setOpen(!open)}>
       <MenuSquareIcon />
-    </button>
+    </IconButton>
   )
   
 }
