@@ -25,11 +25,13 @@ import { useConversation } from "@/context/ConversationContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConverstaionButton";
-import { DeleteIcon } from "lucide-react";
+import { groupConversations, ConversationGroup } from "@/utils";
 const ChatSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
   const navigate = useNavigate()
   const {conversations, clearConverstaions} = useConversation()
+
+  const grouped = groupConversations(conversations)
   const handleClearConveration = () => {
     clearConverstaions()
     navigate("/chat")
@@ -46,19 +48,27 @@ const ChatSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
       <SidebarContent>
          <SidebarGroup>
           <SidebarMenu>
-            {conversations.map((c:Conversation) =>{ 
-              const isActive = location.pathname === `/chat/${c.id}` 
-              return (
-               <SidebarMenuItem key={c.id} >
-                  <SidebarMenuButton 
-                    asChild
-                    className={isActive ? "bg-gray-200 font-semibold" : ""}
-                  >
-                    <Link to={`/chat/${c.id}`}>{c.title}</Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )
-            })}
+          {Object.entries(grouped).map(([label, items]) => 
+            items.length > 0 ? (
+              <div key={label} className="mb-4">
+                <div className="px-4 py-2 text-sm font-medium text-gray-500">{label}</div> 
+                  {items.map((c:Conversation) => {
+                
+                    const isActive = location.pathname === `/chat/${c.id}` 
+                    return (
+                      <SidebarMenuItem key={c.id} >
+                        <SidebarMenuButton 
+                          asChild
+                          className={isActive ? "bg-gray-200 font-semibold" : ""}
+                        >
+                        <Link to={`/chat/${c.id}`}>{c.title}</Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </div>
+            ): null
+          )}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
