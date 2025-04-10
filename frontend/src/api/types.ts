@@ -60,6 +60,9 @@ export interface Message {
   content: string;
   image?: string[];
   tool_calls?: string[];
+  // feilds defined in frontend
+  created_at: number;
+  updated_at: number;
 }
 
 // Define GenerateChatCompletionReq
@@ -166,4 +169,15 @@ export interface ChatCompletionSSERes {
   load_duration?: number;
   eval_count?: number;
   eval_duration?: number;
+}
+
+
+
+// types that use for persistant state
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[]
+  created_at: number;
+  updated_at: number;
 }

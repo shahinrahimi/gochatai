@@ -1,5 +1,5 @@
 import React from "react";
-import {Atom} from "lucide-react"
+import {MessageSquarePlus} from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -8,74 +8,64 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem
+  SidebarFooter,
 } from "@/components/ui/sidebar"
+import { Conversation } from "@/api/types";
+import { useConversation } from "@/context/ConversationContext";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import SidebarButtonTrigger from "./SidebarButtonTrigger";
+import NewConversationButton from "./NewConverstaionButton";
 
-const data = {
-  navMain: [
-    {
-      title: "Getting Started",
-      url: "#",
-      items: [
-        {
-          title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
-    },]
-    }
 const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const {conversations, clearConverstaions} = useConversation()
+  const handleClearConveration = () => {
+    clearConverstaions()
+    navigate("/chat")
+  }
+  const handleNewConveration = () => {
+    navigate("/chat")
+  }
+  React.useEffect(() =>{
+    console.log(open)
+  },[open])
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-      <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Atom className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Documentation</span>
-                  <span className="">v1.0.0</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-       </SidebarMenu> 
+      <div className="px-1 py-4 flex justify-between">
+        <SidebarButtonTrigger />
+        <NewConversationButton />
+      </div>
       </SidebarHeader>
       <SidebarContent>
          <SidebarGroup>
           <SidebarMenu>
-            {data.navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
-                </SidebarMenuButton>
-                {item.items?.length ? (
-                  <SidebarMenuSub>
-                    {item.items.map((item) => (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild isActive={item.isActive}>
-                          <a href={item.url}>{item.title}</a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                ) : null}
-              </SidebarMenuItem>
-            ))}
+            {conversations.map((c:Conversation) =>{ 
+              const isActive = location.pathname === `/chat/${c.id}` 
+              return (
+               <SidebarMenuItem key={c.id} >
+                  <SidebarMenuButton 
+                    asChild
+                    className={isActive ? "bg-gray-200 font-semibold" : ""}
+                  >
+                    <Link to={`/chat/${c.id}`}>{c.title}</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenuButton className="bg-green-200 capitalize" onClick={handleNewConveration}>
+          new converastion 
+        </SidebarMenuButton>
+        <SidebarMenuButton className="bg-orange-200 capitalize" onClick={handleClearConveration}>
+          clear converastion 
+        </SidebarMenuButton>
+      </SidebarFooter>
     </Sidebar>
   )
 }

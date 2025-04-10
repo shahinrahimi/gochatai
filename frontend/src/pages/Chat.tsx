@@ -1,4 +1,3 @@
-
 import React from "react";
 import MessageList from "@/container/MessageList";
 import { Button } from "@/components/ui/button";
@@ -8,10 +7,17 @@ import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
 import { Bot } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useConversation } from "@/context/ConversationContext";
-const ChatLab = () => {
-
+import { useParams, useNavigate } from "react-router-dom";
+import { useSidebar } from "@/components/ui/sidebar";
+import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
+import NewConversationButton from "@/components/custom/NewConverstaionButton";
+const Chat = () => {
+  
+  const navigate = useNavigate()
+  const { id } = useParams<{id:string}>()
+  const {open } = useSidebar()
+  
   const {model, models, setModel} = useLocalModel("completion-lab")
   
   const {
@@ -19,18 +25,22 @@ const ChatLab = () => {
     setInput,
     handleSubmit,
     isLoading,
+    createConversation,
     currentConversation,
-
+    setCurrentId,
   } = useConversation()
 
-  const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  const hasCreatedRef = React.useRef(false)
 
-    // Auto-scroll to bottom when messages change
-  // React.useEffect(() => {
-  //   if (messagesEndRef.current) {
-  //     messagesEndRef.current.scrollIntoView({behavior: "smooth"})
-  //   }
-  // },[messages])
+  React.useEffect(() => {
+    if (!id && !hasCreatedRef.current) {
+      hasCreatedRef.current = true // block recreate new chat
+      const newId = createConversation("New Chat") 
+      navigate(`/chat/${newId}`)
+    } else if (id) {
+      setCurrentId(id)
+    }
+  },[id])
 
    
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -38,23 +48,34 @@ const ChatLab = () => {
       handleSubmit(e, model.name);
     }
   }
+
+  if (!currentConversation) {
+    return <div className="p-4">Conversation not found.</div>
+  }
+
   
- 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-        {/* Header */}
-        <header className="p-4 border-b flex justify-between items-center bg-white">
-          <SidebarTrigger />
+        <header className="p-4 border-b flex justify-between items-center ">
+          <div className="flex gap-2">
+            {!open &&  (
+              <div className="flex gap-2">
+              <SidebarButtonTrigger />
+              <NewConversationButton />
+              </div>
+            )}
+            <SelectModel 
+              model={model} 
+              setModel={setModel} 
+              models={models} 
+            />
+            
+          </div>
           <h1 className="flex flex-row-reverse text-xl justify-center items-center gap-4">
               <span>
                 <Bot size={40} />
                 <LoadingThreedot loading={isLoading} />
               </span>
-              <SelectModel 
-                  model={model} 
-                  setModel={setModel} 
-                  models={models} 
-              />
           </h1>
       </header>
 
@@ -70,7 +91,6 @@ const ChatLab = () => {
           </div>
         </div>
 
-        {/* Input */}
         <div className="p-4 border-t bg-white">
           <form onSubmit={handleFormSubmit} className="flex gap-2">
             <Input
@@ -94,4 +114,4 @@ const ChatLab = () => {
 
 }
 
-export default ChatLab;
+export default Chat;

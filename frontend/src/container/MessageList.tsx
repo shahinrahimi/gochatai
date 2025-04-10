@@ -13,7 +13,7 @@ const MessageList = ({messages}:{messages:Message[]}) => {
           )
         } else {
           return(
-            <li className="max-w-[80%] rounded px-3 py-2 text-sm self-start  bg-gray-100 text-black "  key={index}><MarkdownWithCode text={message.content}/></li>
+            <li className="max-w-[100%] rounded px-3 py-2 text-sm  text-black "  key={index}><MarkdownWithCode text={message.content}/></li>
           )
         }
       })}
