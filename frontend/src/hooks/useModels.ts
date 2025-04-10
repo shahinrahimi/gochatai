@@ -1,7 +1,7 @@
 
 import React from "react";
 import { LocalModel, RunningModel} from "@/api/types"
-import { usePersistentState } from "@/hooks/usePersistantState"
+import { usePersistentState } from "@/hooks/usePersistentState"
 import { fetchLocalModels, fetchRunningModels } from "@/api/models";
 
 export function useLocalModel(storageKey: string) {

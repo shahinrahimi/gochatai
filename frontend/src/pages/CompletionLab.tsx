@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
-import { usePersistentState } from "@/hooks/usePersistantState";
+import { usePersistentState } from "@/hooks/usePersistentState";
 import { useCompletion } from "@/hooks/useCompletation";
 import { Bot } from "lucide-react";
+
 const CompletionLab = () => {
   const [showAdvanced, setShowAdvanced] = React.useState<boolean>(false)
   const [systemPrompt, setSystemPrompt] = usePersistentState<string>("comleation-lab2", "") 
