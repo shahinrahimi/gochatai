@@ -1,14 +1,15 @@
+
 import React from "react"
 import {v4 as uuidv4} from "uuid"
 import  {Message, Conversation }from "@/api/types";
-import { fetchGenerateChatStream } from "@/api/generate-stream";
-import { GenerateChatReq, GenerateCompletionReq } from "@/api/types";
+import { fetchGenerateCompletionStream } from "@/api/generate-stream";
+import { GenerateCompletionReq } from "@/api/types";
 import { fetchGenerateCompletion } from "@/api/generate";
 
-const STORAGE_KEY = "chat-conversations";
+const STORAGE_KEY = "completion-conversations";
 
 
-interface ConversationContextType {
+interface CompletionContextType {
   conversations: Conversation[];
   currentId: string | null;
   setCurrentId: (id: string) => void;
@@ -21,25 +22,34 @@ interface ConversationContextType {
 
   input: string;
   setInput: React.Dispatch<React.SetStateAction<string>>;
+  system: string;
+  setSystem: React.Dispatch<React.SetStateAction<string>>;
+  temperature: number;
+  setTemperature: React.Dispatch<React.SetStateAction<number>>;
+  seed: string;
+  setSeed: React.Dispatch<React.SetStateAction<string>>;
   handleSubmit: (e: React.FormEvent, modelName: string) => void;
   isLoading: boolean;
 }
 
-const ConverationContext = React.createContext<ConversationContextType | undefined>(undefined)
+const CompletionContext = React.createContext<CompletionContextType | undefined>(undefined)
 
-export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({children}) => {
+export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({children}) => {
   const [conversations, setConversations] = React.useState<Conversation[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved): [];
   })
   const [currentId, setCurrentId] = React.useState<string|null>(null)
-  const [input, setInput]=React.useState<string>("")
+  const [input, setInput] = React.useState<string>("")
+  const [system, setSystem] = React.useState<string>("")
+  const [seed, setSeed] = React.useState<string>("")
+  const [temperature, setTemperature] = React.useState<number>(0.7)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     // filter new conversations that is not have any messages
     const conversationsToSave  = conversations.filter((c:Conversation) => c.messages.length > 0)
-    localStorage.setItem("chat-conversations", JSON.stringify(conversationsToSave));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversationsToSave));
   },[conversations])
   
   const getCurrentConversation = ():Conversation | null => {
@@ -137,8 +147,8 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     let conv = getCurrentConversation()
     if (conv?.messages.length === 0) {
       const reqTitle :GenerateCompletionReq = {
-        system : "You're a tool, that receives an input and responds exclusively with a 2-5 word summary of the topic (and absolutely no prose) based specifically on the words used in the input (not the expected output). Each word in the summary should be carefully chosen so that it's perfecly informative - and serve as a perfect title for the input. Now, return the summary for the following input",
-        prompt: input,
+        system: "You are a naming assistant. Given a input as system prompt that describes a tool or AI assistant, generate a short, clear, and creative name that reflects the tool’s purpose. The name should be between 2 to 5 words, memorable, and relevant to the described function. Avoid overly generic names unless contextually fitting.",
+        prompt: system ? system : input,
         model: model,
         stream: false,
       }
@@ -156,9 +166,10 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
 
     }
 
-    const req: GenerateChatReq = {
+    const req: GenerateCompletionReq = {
       model:model,
-      messages: [...(conv?.messages ?? []), m],
+      system: system,
+      prompt: input,
       stream: true,
     }
 
@@ -167,10 +178,10 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     setInput("")
     setIsLoading(true)
    
-    fetchGenerateChatStream(
+    fetchGenerateCompletionStream(
       req,
       (resp) => {
-        updateLastAssistantMessage(resp.message.content)
+        updateLastAssistantMessage(resp.response)
         if (resp.done) setIsLoading(false)
       },
       (err) => {
@@ -190,23 +201,32 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     createConversation,
     clearConverstaions,
     getCurrentConversation,
-
+    
     setInput,
     input,
+    setSystem,
+    system,
+    setTemperature,
+    temperature,
+    seed,
+    setSeed,
+    
     handleSubmit,
     isLoading
 
   }
 
   return (
-    <ConverationContext.Provider value={value}>
+    <CompletionContext.Provider value={value}>
       {children}
-    </ConverationContext.Provider>
+    </CompletionContext.Provider>
   )
 }
 
-export const useConversation = () => {
-  const ctx = React.useContext(ConverationContext);
-  if (!ctx) throw new Error("useConversation must be used within ConversationProvider")
+export const useCompletion = () => {
+  const ctx = React.useContext(CompletionContext);
+  if (!ctx) throw new Error("useCompletion must be used within CompletionProvider")
   return ctx
 }
+
+

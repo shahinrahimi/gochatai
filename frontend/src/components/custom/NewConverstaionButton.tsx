@@ -1,12 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {MessageSquarePlus} from "lucide-react"
 import IconButton from "../IconButton";
-const NewConversationButton = () => {
-  const navigate = useNavigate()
+interface NewConversationButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+}
 
+const NewConversationButton = ({className="",...props}:NewConversationButtonProps) => {
   return (
-    <IconButton onClick={() => navigate("/chat")}>
+    <IconButton className={`${className}`} {...props}>
       <MessageSquarePlus />
     </IconButton>
   )
