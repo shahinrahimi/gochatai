@@ -11,7 +11,6 @@ export enum ConversationGroup {
 
 
 export function groupConversations(conversatins:Conversation[]) {
-  console.log("grouping")
   const groups: Record<ConversationGroup, Conversation[]> = {
     [ConversationGroup.TODAY]: [],
     [ConversationGroup.YESTERDAY]: [],

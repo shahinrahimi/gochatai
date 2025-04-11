@@ -51,20 +51,55 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
     const conversationsToSave  = conversations.filter((c:Conversation) => c.messages.length > 0)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(conversationsToSave));
   },[conversations])
+
+  React.useEffect(() => {
+    const conv = getCurrentConversation();
+    if (conv) {
+      setSystem(conv.system || "")
+      setTemperature(conv.temperature ?? 0.7)
+      setSeed(conv.seed || "")
+    }
+  }, [currentId])
+
+  React.useEffect(() => {
+    if (currentId) {
+      updateCurrentConversationSettings({ system })
+    }
+  }, [system])
+
+  React.useEffect(() => {
+    if (currentId) {
+      updateCurrentConversationSettings({ temperature })
+    }
+  }, [temperature])
+
+  React.useEffect(() => {
+    if (currentId) {
+      updateCurrentConversationSettings({ seed })
+    }
+  }, [seed])
   
   const getCurrentConversation = ():Conversation | null => {
     return conversations.find((c:Conversation) => c.id === currentId) || null;
   }
 
+  const updateCurrentConversationSettings = (updates: Partial<Conversation>) => {
+    setConversations((prevConvs) => 
+      prevConvs.map((c:Conversation) => 
+        c.id === currentId ? {...c, ...updates, updated_at: Date.now()} : c
+      ) 
+    )
+  }
+
   const renameConversation = (id:string, newTitle: string) => {
     setConversations((prevConvs) =>
-      prevConvs.map((c) =>
+      prevConvs.map((c:Conversation) =>
         c.id === id ? { ...c, title: newTitle, updated_at: Date.now() } : c
       )
     );
   }
 
-  const createConversation = (title = "New Chat"):string => {
+  const createConversation = (title = "New Completion"):string => {
     const id = uuidv4() 
     const newConv:Conversation = {
       id,
@@ -72,6 +107,9 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
       messages:[],
       created_at: Date.now(),
       updated_at: Date.now(),
+      system :"",
+      temperature: 0.7,
+      seed : "",
     }
 
     setConversations((prev:Conversation[]) => [newConv, ...prev])
@@ -144,13 +182,15 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
       updated_at: Date.now()
     }
     
-    let conv = getCurrentConversation()
-    if (conv?.messages.length === 0) {
+    // let conv = getCurrentConversation()
+    if (true) {
+    // if (conv?.messages.length === 0) {
       const reqTitle :GenerateCompletionReq = {
-        system: "You are a naming assistant. Given a input as system prompt that describes a tool or AI assistant, generate a short, clear, and creative name that reflects the tool’s purpose. The name should be between 2 to 5 words, memorable, and relevant to the described function. Avoid overly generic names unless contextually fitting.",
+        system: "You are a naming assistant. Given a system prompt that describes a tool or AI assistant, generate a short, clear, and creative name that reflects the tool’s purpose. The name must be between 2 to 4 words, relevant to the described function. Respond only with the name. Do not include any explanation or extra text. now name this assistance for following prompt as system input:",
         prompt: system ? system : input,
         model: model,
         stream: false,
+        keep_alive: "0m", 
       }
 
 
@@ -158,6 +198,7 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
       reqTitle,
       (resp) => {
         if (currentId) {
+          console.log(resp)
           renameConversation(currentId, resp) 
         }
       },

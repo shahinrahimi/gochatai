@@ -180,4 +180,7 @@ export interface Conversation {
   messages: Message[]
   created_at: number;
   updated_at: number;
+  system?: string;
+  temperature?: number;
+  seed?: string;
 }
