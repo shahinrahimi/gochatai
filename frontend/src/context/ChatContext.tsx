@@ -19,6 +19,7 @@ interface ChatContextType {
   clearConversations: () => void;
   getCurrentConversation: () => Conversation | null;
   currentConversation: Conversation | null;
+  deleteConversation: (id:string) => void;
 
   input: string;
   setInput: React.Dispatch<React.SetStateAction<string>>;
@@ -45,6 +46,10 @@ export const ChatProvider: React.FC<{children:React.ReactNode}> = ({children}) =
   
   const getCurrentConversation = ():Conversation | null => {
     return conversations.find((c:Conversation) => c.id === currentId) || null;
+  }
+
+  const deleteConversation = (id:string) => {
+    setConversations((prevConvs) => prevConvs.filter((c:Conversation) => c.id !== id))
   }
 
   const renameConversation = (id:string, newTitle: string) => {
@@ -191,6 +196,7 @@ export const ChatProvider: React.FC<{children:React.ReactNode}> = ({children}) =
     createConversation,
     clearConversations,
     getCurrentConversation,
+    deleteConversation,
 
     setInput,
     input,

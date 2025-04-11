@@ -5,8 +5,6 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { 
@@ -22,14 +20,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Conversation } from "@/api/types";
 import { useChat } from "@/context/ChatContext";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConversationButton";
 import { groupConversations } from "@/utils";
+import SidebarConversationItem from "@/components/custom/SidbarConversationItem";
 const ChatSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const {conversations, clearConversations} = useChat()
+  const {conversations, clearConversations, deleteConversation} = useChat()
 
   const grouped = groupConversations(conversations)
   const handleClearConveration = () => {
@@ -56,14 +55,14 @@ const ChatSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
                 
                     const isActive = location.pathname === `/chat/${c.id}` 
                     return (
-                      <SidebarMenuItem key={c.id} >
-                        <SidebarMenuButton 
-                          asChild
-                          className={isActive ? "bg-gray-200 font-semibold" : ""}
-                        >
-                        <Link to={`/chat/${c.id}`}>{c.title}</Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
+                      <SidebarConversationItem 
+                        key={c.id}
+                        c={c}
+                        root="chat"
+                        isActive={isActive}
+                        onDelete={deleteConversation}
+      
+                      />
                     )
                   })}
                 </div>

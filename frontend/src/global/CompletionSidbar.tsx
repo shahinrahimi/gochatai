@@ -6,8 +6,6 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { 
@@ -22,15 +20,16 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { Conversation } from "@/api/types";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConversationButton";
 import { groupConversations } from "@/utils";
 import { useCompletion } from "@/context/CompletionContext";
+import SidebarConversationItem from "@/components/custom/SidbarConversationItem";
 const CompletionSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const {conversations, clearConversations} = useCompletion()
+  const {conversations, clearConversations, deleteConversation} = useCompletion()
 
   const grouped = groupConversations(conversations)
   const handleClearConveration = () => {
@@ -57,14 +56,13 @@ const CompletionSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) =>
                 
                     const isActive = location.pathname === `/completion/${c.id}` 
                     return (
-                      <SidebarMenuItem key={c.id} >
-                        <SidebarMenuButton 
-                          asChild
-                          className={isActive ? "bg-gray-200 font-semibold" : ""}
-                        >
-                        <Link to={`/completion/${c.id}`}>{c.title}</Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
+                      <SidebarConversationItem
+                        key={c.id}
+                        c={c}
+                        root="completion"
+                        isActive={isActive}
+                        onDelete={deleteConversation}
+                      />
                     )
                   })}
                 </div>

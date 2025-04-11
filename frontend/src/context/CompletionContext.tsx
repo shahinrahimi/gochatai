@@ -19,6 +19,7 @@ interface CompletionContextType {
   clearConversations: () => void;
   getCurrentConversation: () => Conversation | null;
   currentConversation: Conversation | null;
+  deleteConversation: (id: string) => void;
 
   input: string;
   setInput: React.Dispatch<React.SetStateAction<string>>;
@@ -97,6 +98,12 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
         c.id === id ? { ...c, title: newTitle, updated_at: Date.now() } : c
       )
     );
+  }
+
+  const deleteConversation = (id:string) => {
+    setConversations((prevConvs) =>
+      prevConvs.filter((c:Conversation) => c.id !== id)
+    ) 
   }
 
   const createConversation = (title = "New Completion"):string => {
@@ -242,6 +249,7 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
     createConversation,
     clearConversations,
     getCurrentConversation,
+    deleteConversation,
     
     setInput,
     input,
