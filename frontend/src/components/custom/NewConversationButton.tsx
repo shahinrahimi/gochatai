@@ -1,6 +1,6 @@
 import React from "react";
 import {MessageSquarePlus} from "lucide-react"
-import IconButton from "../IconButton";
+import IconButton from "./IconButton";
 interface NewConversationButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }

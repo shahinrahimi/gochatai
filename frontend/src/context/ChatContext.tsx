@@ -1,3 +1,4 @@
+
 import React from "react"
 import {v4 as uuidv4} from "uuid"
 import  {Message, Conversation }from "@/api/types";
@@ -8,14 +9,14 @@ import { fetchGenerateCompletion } from "@/api/generate";
 const STORAGE_KEY = "chat-conversations";
 
 
-interface ConversationContextType {
+interface ChatContextType {
   conversations: Conversation[];
   currentId: string | null;
   setCurrentId: (id: string) => void;
   addMessageToCurrent: (message: Message) => void;
   updateLastAssistantMessage: (content: string) => void;
   createConversation: (title?:string) => string;
-  clearConverstaions: () => void;
+  clearConversations: () => void;
   getCurrentConversation: () => Conversation | null;
   currentConversation: Conversation | null;
 
@@ -25,9 +26,9 @@ interface ConversationContextType {
   isLoading: boolean;
 }
 
-const ConverationContext = React.createContext<ConversationContextType | undefined>(undefined)
+const ChatContext = React.createContext<ChatContextType | undefined>(undefined)
 
-export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({children}) => {
+export const ChatProvider: React.FC<{children:React.ReactNode}> = ({children}) => {
   const [conversations, setConversations] = React.useState<Conversation[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved): [];
@@ -46,7 +47,7 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     return conversations.find((c:Conversation) => c.id === currentId) || null;
   }
 
-  const renameConverstation = (id:string, newTitle: string) => {
+  const renameConversation = (id:string, newTitle: string) => {
     setConversations((prevConvs) =>
       prevConvs.map((c) =>
         c.id === id ? { ...c, title: newTitle, updated_at: Date.now() } : c
@@ -98,7 +99,7 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     );
   };
 
-  const clearConverstaions = () => {
+  const clearConversations = () => {
     setConversations([]);
     setCurrentId(null)    
   }
@@ -148,7 +149,7 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
       reqTitle,
       (resp) => {
         if (currentId) {
-          renameConverstation(currentId, resp) 
+          renameConversation(currentId, resp) 
         }
       },
       (error) => console.log(error)
@@ -188,7 +189,7 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
     addMessageToCurrent,
     updateLastAssistantMessage,
     createConversation,
-    clearConverstaions,
+    clearConversations,
     getCurrentConversation,
 
     setInput,
@@ -199,14 +200,14 @@ export const ConverationProvider: React.FC<{children:React.ReactNode}> = ({child
   }
 
   return (
-    <ConverationContext.Provider value={value}>
+    <ChatContext.Provider value={value}>
       {children}
-    </ConverationContext.Provider>
+    </ChatContext.Provider>
   )
 }
 
-export const useConversation = () => {
-  const ctx = React.useContext(ConverationContext);
-  if (!ctx) throw new Error("useConversation must be used within ConversationProvider")
+export const useChat = () => {
+  const ctx = React.useContext(ChatContext);
+  if (!ctx) throw new Error("useChat must be used within ChatProvider")
   return ctx
 }

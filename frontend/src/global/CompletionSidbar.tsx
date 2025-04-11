@@ -24,17 +24,17 @@ import {
 import { Conversation } from "@/api/types";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
-import NewConversationButton from "@/components/custom/NewConverstaionButton";
+import NewConversationButton from "@/components/custom/NewConversationButton";
 import { groupConversations } from "@/utils";
 import { useCompletion } from "@/context/CompletionContext";
 const CompletionSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const {conversations, clearConverstaions} = useCompletion()
+  const {conversations, clearConversations} = useCompletion()
 
   const grouped = groupConversations(conversations)
   const handleClearConveration = () => {
-    clearConverstaions()
+    clearConversations()
     navigate("/completion")
   }
   

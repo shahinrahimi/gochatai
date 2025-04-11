@@ -7,11 +7,11 @@ import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
 import { Bot } from "lucide-react";
 import LoadingThreedot from "@/components/custom/LoadingThreedot";
-import { useConversation } from "@/context/ConversationContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useChat } from "@/context/ChatContext";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
-import NewConversationButton from "@/components/custom/NewConverstaionButton";
+import NewConversationButton from "@/components/custom/NewConversationButton";
 const Chat = () => {
   
   const navigate = useNavigate()
@@ -28,7 +28,7 @@ const Chat = () => {
     createConversation,
     currentConversation,
     setCurrentId,
-  } = useConversation()
+  } = useChat()
 
   const hasCreatedRef = React.useRef(false)
 

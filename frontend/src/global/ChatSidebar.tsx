@@ -21,19 +21,19 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { Conversation } from "@/api/types";
-import { useConversation } from "@/context/ConversationContext";
+import { useChat } from "@/context/ChatContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
-import NewConversationButton from "@/components/custom/NewConverstaionButton";
-import { groupConversations, ConversationGroup } from "@/utils";
+import NewConversationButton from "@/components/custom/NewConversationButton";
+import { groupConversations } from "@/utils";
 const ChatSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const {conversations, clearConverstaions} = useConversation()
+  const {conversations, clearConversations} = useChat()
 
   const grouped = groupConversations(conversations)
   const handleClearConveration = () => {
-    clearConverstaions()
+    clearConversations()
     navigate("/chat")
   }
   
@@ -42,7 +42,7 @@ const ChatSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
       <SidebarHeader>
       <div className="px-1 py-4 flex justify-between">
         <SidebarButtonTrigger />
-        <NewConversationButton />
+        <NewConversationButton onClick={() => navigate("/chat")} />
       </div>
       </SidebarHeader>
       <SidebarContent>
