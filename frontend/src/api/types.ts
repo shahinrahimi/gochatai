@@ -61,6 +61,7 @@ export interface Message {
   image?: string[];
   tool_calls?: string[];
   // feilds defined in frontend
+  creator: string;
   created_at: number;
   updated_at: number;
 }

@@ -175,6 +175,7 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
     const m:Message = {
       content: input,
       role: "user",
+      creator: "user",
       created_at: Date.now(),
       updated_at: Date.now()
     }
@@ -184,6 +185,7 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
         // feaure reply or Message
     const featuredMessage:Message = {
       content: "",
+      creator: model,
       role: "assistant",
       created_at: Date.now(),
       updated_at: Date.now()
@@ -205,7 +207,6 @@ export const CompletionProvider: React.FC<{children:React.ReactNode}> = ({childr
       reqTitle,
       (resp) => {
         if (currentId) {
-          console.log(resp)
           renameConversation(currentId, resp) 
         }
       },

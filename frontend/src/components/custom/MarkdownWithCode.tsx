@@ -15,6 +15,17 @@ export const MarkdownWithCode = ({ text }: {text: string}) => {
       code(props) {
         const {children, className, node, ...rest} = props
         const match = /language-(\w+)/.exec(className || '')
+        const codeText = String(children).replace(/\n$/, "")
+        const [copied, setCopied] = React.useState(false)
+        const handleCopy = async () => {
+          try {
+            await navigator.clipboard.writeText(codeText)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1000)
+          } catch (err){
+            console.error("Failed to copy!", err)
+          }
+        }
         return match ? (
           <div 
             style={{
@@ -27,6 +38,8 @@ export const MarkdownWithCode = ({ text }: {text: string}) => {
                 borderLeft: "2px solid #ccc",
                 borderRight: "2px solid #ccc",
                 display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 padding:"8px 16px", 
                 backgroundColor:"#777", 
                 marginBottom:"0", 
@@ -35,7 +48,22 @@ export const MarkdownWithCode = ({ text }: {text: string}) => {
                 borderTopRightRadius: "8px",
                 borderTopLeftRadius: "8px"
             }}>
-              {`~ ${match[1].toUpperCase()}`} 
+              <span>{`~ ${match[1].toUpperCase()}`}</span>
+              <button
+                onClick={handleCopy}
+                 style={{
+                    backgroundColor: copied ? "#4caf50" : "#555",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "4px 8px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                  }}
+              >
+              {copied ? "Copied": "Copy"}
+              </button>
+              
             </div>
             <SyntaxHighlighter
               {...(rest as any)} // Fix ref issue by casting props

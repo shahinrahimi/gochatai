@@ -13,6 +13,7 @@ import { useCompletion } from "@/context/CompletionContext";
 import { Bot } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSidebar } from "@/components/ui/sidebar";
+import ConversationView from "@/container/CoversationView";
 const Completion = () => {
   const [showAdvanced, setShowAdvanced] = React.useState<boolean>(false)
   const navigate = useNavigate()
@@ -129,10 +130,8 @@ const Completion = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="max-w-7xl mx-auto">
           {currentConversation ? (
-            <MessageList messages={currentConversation.messages} />
-          ): (
-            <MessageList messages={[]} />
-          )}
+            <ConversationView c={currentConversation} />
+          ):null}
           </div>
         </div>
 

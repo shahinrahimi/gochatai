@@ -126,6 +126,7 @@ export const ChatProvider: React.FC<{children:React.ReactNode}> = ({children}) =
     const m:Message = {
       content: input,
       role: "user",
+      creator: "user",
       created_at: Date.now(),
       updated_at: Date.now()
     }
@@ -136,6 +137,7 @@ export const ChatProvider: React.FC<{children:React.ReactNode}> = ({children}) =
     const featuredMessage:Message = {
       content: "",
       role: "assistant",
+      creator: model,
       created_at: Date.now(),
       updated_at: Date.now()
     }

@@ -1,5 +1,4 @@
 import React from "react";
-import MessageList from "@/container/MessageList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
@@ -12,6 +11,8 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useChat } from "@/context/ChatContext";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConversationButton";
+import ConversationView from "@/container/CoversationView";
+
 const Chat = () => {
   
   const navigate = useNavigate()
@@ -83,11 +84,8 @@ const Chat = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="max-w-7xl mx-auto">
           {currentConversation ? (
-            <MessageList messages={currentConversation.messages} />
-          ): (
-
-            <MessageList messages={[]} />
-          )}
+            <ConversationView c={currentConversation} />
+          ):null}
           </div>
         </div>
 
