@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import { Send, CornerDownLeft } from "lucide-react";
 import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
 import { Bot } from "lucide-react";
@@ -12,6 +12,7 @@ import { useChat } from "@/context/ChatContext";
 import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConversationButton";
 import ConversationView from "@/container/CoversationView";
+import { Textarea } from "@/components/ui/textarea";
 
 const Chat = () => {
   
@@ -54,6 +55,8 @@ const Chat = () => {
     return <div className="p-4">Conversation not found.</div>
   }
 
+  const isActive = (!isLoading) && (input.trim() !== "") && model 
+
   
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -80,7 +83,6 @@ const Chat = () => {
           </h1>
       </header>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="max-w-7xl mx-auto">
           {currentConversation ? (
@@ -88,23 +90,36 @@ const Chat = () => {
           ):null}
           </div>
         </div>
+       
 
         <div className="p-4 border-t bg-white">
-          <form onSubmit={handleFormSubmit} className="flex gap-2">
-            <Input
+          <form onSubmit={handleFormSubmit} className="flex-col">
+            <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
-              className="flex-1"
+              className="flex-1 mb-4 focus-visible:ring-0 min-h-24"
               disabled={isLoading}
             />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
-              {isLoading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </Button>
+            <div className="flex justify-between gap-4">
+              <SelectModel 
+                model={model} 
+                setModel={setModel} 
+                models={models} 
+                className="flex-1 focus:ring-0 h-12 focus:outline-none"
+              />
+            
+              <Button
+                className={`flex bg-gray-300 text-gray-600 px-4 py-6 ${isActive ? "bg-cyan-500 text-white": ""}`}
+                disabled={!isActive}
+                type="submit"
+              > 
+                <span className="">Run</span>
+                <span className={`py-0.5 px-2 border-gray-400 border-1 flex justify-center items-center rounded-sm ${isActive ? "border-white": ""}`}>
+                  <CornerDownLeft className="" />  
+                </span>
+              </Button>
+            </div>
           </form>
         </div>
     </div>
