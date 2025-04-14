@@ -2,6 +2,7 @@ import React from 'react';
 import {Outlet} from 'react-router-dom'
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import ChatSidebar from '@/global/ChatSidebar';
+  
 
 const ChatLayout = () => { 
   return (

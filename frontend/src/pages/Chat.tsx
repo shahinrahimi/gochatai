@@ -12,6 +12,7 @@ import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConversationButton";
 import ConversationView from "@/container/CoversationView";
 import { Textarea } from "@/components/ui/textarea";
+import Header from "@/global/Header";
 
 const Chat = () => {
   
@@ -59,36 +60,14 @@ const Chat = () => {
   
   return (
     <div className="flex flex-col h-screen  bg-gray-50">
-        <header className="p-4 border-b flex justify-between items-center ">
-          <div className="flex gap-2">
-            {!open &&  (
-              <div className="flex gap-2">
-              <SidebarButtonTrigger />
-              <NewConversationButton />
-              </div>
-            )}
-            <SelectModel 
-              model={model} 
-              setModel={setModel} 
-              models={models} 
-            />
-            
-          </div>
-          <h1 className="flex flex-row-reverse text-xl justify-center items-center gap-4">
-              <span>
-                <Bot size={40} />
-                <LoadingThreedot loading={isLoading} />
-              </span>
-          </h1>
-      </header>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="max-w-7xl mx-auto">
-          {currentConversation ? (
-            <ConversationView c={currentConversation} />
-          ):null}
-          </div>
+      <Header />
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="max-w-7xl mx-auto">
+        {currentConversation ? (
+          <ConversationView c={currentConversation} />
+        ):null}
         </div>
+      </div>
        
 
         <div className="p-4 border-t bg-white">

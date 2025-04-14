@@ -1,24 +1,24 @@
 
 import React from "react";
-import MessageList from "@/container/MessageList";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+
 import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
 import { useCompletion } from "@/context/CompletionContext";
 import { Bot } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSidebar } from "@/components/ui/sidebar";
 import ConversationView from "@/container/CoversationView";
+import Header from "@/global/Header";
+import { CornerDownLeft } from "lucide-react";
+import { Label } from "@/components/ui/label";
 const Completion = () => {
   const [showAdvanced, setShowAdvanced] = React.useState<boolean>(false)
   const navigate = useNavigate()
   const { id } = useParams<{id:string}>()
-  const {open } = useSidebar()
   
 
   const {model, models, setModel} = useLocalModel("completion-lab")
@@ -59,73 +59,17 @@ const Completion = () => {
     }
       
   }
+
+  const isActive = (!isLoading) && (input.trim() !== "") && model 
     
   
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
-      {/* Settings Panel */}
-      <div
-        className={`${showAdvanced ? "w-full md:w-1/4 p-4 opacity-100" : "w-0 p-0 opacity-0"} transition-all duration-300 overflow-hidden bg-white border-r`}
-      >
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold">Advanced Settings</h2>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Model</label>
-            <SelectModel model={model} setModel={setModel} models={models} />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">System Prompt</label>
-            <Textarea
-              value={system}
-              onChange={(e) => setSystem(e.target.value)}
-              className="min-h-[100px]"
-              placeholder="Enter system instructions for the AI"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <label className="text-sm font-medium">Temperature: {temperature.toFixed(1)}</label>
-            </div>
-            <Slider
-              value={[temperature]}
-              min={0}
-              max={2}
-              step={0.1}
-              onValueChange={(value) => setTemperature(value[0])}
-            />
-            <p className="text-xs text-gray-500">Lower values = more deterministic, higher values = more creative</p>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Seed (optional)</label>
-            <Input
-              type="number"
-              value={seed}
-              onChange={(e) => setSeed(e.target.value)}
-              placeholder="Random seed for reproducibility"
-            />
-            <p className="text-xs text-gray-500">Same seed + temperature = same response</p>
-          </div>
-        </div>
-      </div>
-
+    <div className="flex flex-col h-screen bg-gray-50">
+      <Header />
+      
       {/* Chat Interface */}
       <div className={`flex-1 flex flex-col ${showAdvanced ? "md:w-2/3" : "w-full"} transition-all duration-300`}>
-        {/* Header */}
-        <header className="p-4 border-b flex justify-between items-center bg-white">
-          <h1 className="flex text-xl justify-center align-baseline gap-8">
-            <span className=""><Bot /></span>
-            <span className="">{model?.name}</span>
-          </h1>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Advanced Mode</span>
-            <Switch checked={showAdvanced} onCheckedChange={setShowAdvanced} />
-          </div>
-        </header>
-
+        
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="max-w-7xl mx-auto">
@@ -135,25 +79,82 @@ const Completion = () => {
           </div>
         </div>
 
+      <div className="p-4 border-t space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="system-prompt">System Prompt</Label>
+            <Textarea
+              id="system-prompt"
+              value={system}
+              onChange={(e) => setSystem(e.target.value)}
+              placeholder="Enter system prompt..."
+              className="resize-none h-20"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label htmlFor="temperature">Temperature: {temperature.toFixed(1)}</Label>
+              </div>
+              <Slider
+                id="temperature"
+                min={0}
+                max={1}
+                step={0.1}
+                value={[temperature]}
+                onValueChange={(value) => setTemperature(value[0])}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="seed">Seed</Label>
+              <Input
+                id="seed"
+                type="number"
+                value={seed}
+                onChange={(e) => setSeed(e.target.value)}
+                placeholder="Enter seed (optional)"
+              />
+            </div>
+          </div>
+        </div>
+        </div>
         {/* Input */}
-        <div className="p-4 border-t bg-white">
-          <form onSubmit={handleFormSubmit} className="flex gap-2">
-            <Input
+<div className="p-4 border-t bg-white">
+          <form onSubmit={handleFormSubmit} className="flex-col">
+
+            <Switch checked={showAdvanced} onCheckedChange={setShowAdvanced} />
+            <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
-              className="flex-1"
+              className="flex-1 mb-4 focus-visible:ring-0 min-h-24"
               disabled={isLoading}
             />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
-              {isLoading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </Button>
+            <div className="flex justify-between gap-4">
+              <SelectModel 
+                model={model} 
+                setModel={setModel} 
+                models={models} 
+                className="flex-1 focus:ring-0 h-12 focus:outline-none"
+              />
+            
+              <Button
+                className={`flex bg-gray-300 text-gray-600 px-4 py-6 ${isActive ? "bg-cyan-500 text-white": ""}`}
+                disabled={!isActive}
+                type="submit"
+              > 
+                <span className="">Run</span>
+                <span className={`py-0.5 px-2 border-gray-400 border-1 flex justify-center items-center rounded-sm ${isActive ? "border-white": ""}`}>
+                  <CornerDownLeft className="" />  
+                </span>
+              </Button>
+            </div>
           </form>
         </div>
+
       </div>
     </div>
   )
