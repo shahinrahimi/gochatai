@@ -1,12 +1,12 @@
-
-
 import React from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {atomDark} from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { useSidebar } from "../ui/sidebar";
 
 export const MarkdownWithCode = ({ text }: {text: string}) => {
+  const {open} = useSidebar()
   return (
     <Markdown
     remarkPlugins={[remarkGfm]}
@@ -30,10 +30,18 @@ export const MarkdownWithCode = ({ text }: {text: string}) => {
           <div 
             style={{
               margin: "24px 0", 
-              padding: "8px"
+              padding: "8px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+            <div style={{
+              maxWidth: open ? "calc(100vw - 400px)": "100vw",
+              width: "100%"
             }}>
             <div 
-              style={{
+              style={{maxWidth: open ? "calc(100vw - 400px)": "100vw", 
                 borderTop: "2px solid #ccc",
                 borderLeft: "2px solid #ccc",
                 borderRight: "2px solid #ccc",
@@ -82,6 +90,7 @@ export const MarkdownWithCode = ({ text }: {text: string}) => {
                 borderRadius: "6px",
               }}
             />
+              </div>
 
           </div>
         ) : (

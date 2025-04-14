@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send, CornerDownLeft } from "lucide-react";
+import { CornerDownLeft } from "lucide-react";
 import SelectModel from "@/components/custom/SelectModel";
 import { useLocalModel } from "@/hooks/useModels";
 import { Bot } from "lucide-react";
@@ -59,7 +58,7 @@ const Chat = () => {
 
   
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen  bg-gray-50">
         <header className="p-4 border-b flex justify-between items-center ">
           <div className="flex gap-2">
             {!open &&  (

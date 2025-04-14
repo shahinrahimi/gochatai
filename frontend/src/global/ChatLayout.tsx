@@ -5,9 +5,10 @@ import ChatSidebar from '@/global/ChatSidebar';
 
 const ChatLayout = () => { 
   return (
+
     <SidebarProvider>
       <ChatSidebar />
-      <SidebarInset>
+      <SidebarInset className='max-w-full'>
           <Outlet />
       </SidebarInset>
     </SidebarProvider>

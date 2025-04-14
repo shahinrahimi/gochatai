@@ -1,35 +1,46 @@
 import React from "react";
 import { Conversation, Message } from "@/api/types";
 import MarkdownWithCode from "@/components/custom/MarkdownWithCode";
+import { formatDistanceToNow } from 'date-fns';
+
 type CoversationViewProps = {
   c:Conversation 
 }
+import { Copy } from "lucide-react";
 
 type MessageViewProps = {
   m: Message
 }
 
 const MessageView = ({m}:MessageViewProps) => {
-  const date = new Date(m.created_at)
-  const dateString = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
-
-  
-  if (m.role === "user") {
-    return (
-      <li className={`flex-col px-2 pb-1 pt-0.5 border-1 border-gray-100 rounded-sm self-end bg-cyan-600 text-white`}>
-        <p className="text-xs text-gray-300 mb-1">{m.creator} ~ {dateString}</p>
-        <p>{m.content}</p>
-      </li>
-    )
-  } else {
-    return (
-      <li className={`flex-col px-2 pb-1 pt-0.5 border-1 border-gray-300 rounded-sm self-center`}>
-        <p className="text-xs text-gray-400 mb-1">{m.creator} ~ {dateString}</p>
-        <MarkdownWithCode text={m.content} />
-      </li>
-    )
+  const isUser = m.role == "user"
+  const frindlyTime = formatDistanceToNow(new Date(m.updated_at), {addSuffix: true})
+  const footerString = `${isUser ? "" : m.creator + " ~ " }${frindlyTime}` 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(m.content)
+    } catch (err){
+      console.error("Failed to copy!", err)
+    }
   }
-}
+
+  return (
+    <li className={`border-1 rounded-sm p-4 group`}> 
+      <div className="flex justify-between text-gray-500 font-light">
+        <p className="uppercase text-gray-400 px-1.5 py-1 border-gray-300 border-1 rounded-sm text-xs mb-4">{isUser ? "you" : "assisstant"}</p>
+        <div 
+          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+          role="button"
+          onClick={() => handleCopy()}
+          >
+          <Copy />
+        </div>
+      </div>
+      { isUser ? m.content: <MarkdownWithCode text={m.content} />}
+      <p className="text-sm text-gray-400 mt-2 text-right">{footerString}</p>
+    </li>
+  )
+ }
 
 const ConversationView = ({c}:CoversationViewProps) => {
  return (
