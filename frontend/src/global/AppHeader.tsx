@@ -1,21 +1,16 @@
 
-import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ROUTES } from "@/constants";
 
-const Header = () => {
+const AppHeader = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
-  const tabs = [
-    { label: "Chat", path: "/chat" },
-    { label: "Completion", path: "/completion" },
-  ];
-
   return (
     <header className="flex w-full border-b bg-white px-4 py-2">
-      {tabs.map((tab) => (
+      {ROUTES.map((tab) => (
         <button
           key={tab.path}
           onClick={() => navigate(tab.path)}
@@ -32,4 +27,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default AppHeader;

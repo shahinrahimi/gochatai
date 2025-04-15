@@ -12,7 +12,7 @@ import SidebarButtonTrigger from "@/components/custom/SidebarButtonTrigger";
 import NewConversationButton from "@/components/custom/NewConversationButton";
 import ConversationView from "@/container/CoversationView";
 import { Textarea } from "@/components/ui/textarea";
-import Header from "@/global/Header";
+import Header from "@/global/AppHeader";
 
 const Chat = () => {
   

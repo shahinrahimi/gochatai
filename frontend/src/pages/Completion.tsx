@@ -12,7 +12,7 @@ import { useCompletion } from "@/context/CompletionContext";
 import { Bot } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import ConversationView from "@/container/CoversationView";
-import Header from "@/global/Header";
+import Header from "@/global/AppHeader";
 import { CornerDownLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 const Completion = () => {
@@ -68,15 +68,12 @@ const Completion = () => {
       <Header />
       
       {/* Chat Interface */}
-      <div className={`flex-1 flex flex-col ${showAdvanced ? "md:w-2/3" : "w-full"} transition-all duration-300`}>
         
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="max-w-7xl mx-auto">
+        <div className="flex-1 p-4">
           {currentConversation ? (
             <ConversationView c={currentConversation} />
           ):null}
-          </div>
         </div>
 
       <div className="p-4 border-t space-y-4">
@@ -119,7 +116,6 @@ const Completion = () => {
               />
             </div>
           </div>
-        </div>
         </div>
         {/* Input */}
 <div className="p-4 border-t bg-white">

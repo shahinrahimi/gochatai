@@ -2,9 +2,10 @@ import React from "react";
 import { Conversation, Message } from "@/api/types";
 import MarkdownWithCode from "@/components/custom/MarkdownWithCode";
 import { formatDistanceToNow } from 'date-fns';
+import { Bot } from "lucide-react";
 
 type CoversationViewProps = {
-  c:Conversation 
+  c:Conversation
 }
 import { Copy } from "lucide-react";
 
@@ -43,6 +44,15 @@ const MessageView = ({m}:MessageViewProps) => {
  }
 
 const ConversationView = ({c}:CoversationViewProps) => {
+  if (c.messages.length === 0) {
+    return (
+      <div className="flex flex-col items-center bg-red-200 justify-center text-center p-8 text-muted-foreground">
+        <Bot className="h-12 w-12 mb-4 text-cyan-600" />
+        <h3 className="text-lg font-medium">No messages yet</h3>
+        <p className="text-sm">Start a conversation by typing a message below.</p>
+      </div>
+    )
+  }
  return (
    <ol className="my-4 flex flex-col h-fit min-h-full gap-8">
       {c.messages.map((message:Message, index) => <MessageView key={index} m={message} />)}
