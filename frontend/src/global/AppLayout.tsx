@@ -6,11 +6,10 @@ const AppLayout = () => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className='max-w-full'>
+      <SidebarInset className='max-w-full h-screen'>
           <Outlet />
       </SidebarInset>
     </SidebarProvider>
-
   ) 
 }
 

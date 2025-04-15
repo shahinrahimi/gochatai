@@ -1,13 +1,10 @@
 import { Routes, Route } from 'react-router-dom'
 import AppLayout from './global/AppLayout'
-import ChatLayout from './global/ChatLayout'
-import CompletionLayout from './global/CompletionLayout'
 import Chat from '@/pages/Chat'
 import Completion from './pages/Completion'
 import NotFoundPage from '@/pages/NotFoundPage'
-
-
 import './App.css'
+
 function App() {
   return (
     <Routes>
