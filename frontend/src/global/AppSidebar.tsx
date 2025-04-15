@@ -31,12 +31,24 @@ import { useCompletion } from "@/context/CompletionContext";
 const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const {conversations, clearConversations, deleteConversation} = useChat()
+
+  const isChat = location.pathname.startsWith("/chat")
+  const rootPath = isChat ? "chat" : "completion"
+  const {
+    conversations, 
+    clearConversations, 
+    deleteConversation
+  } = isChat ? useChat() : useCompletion()
 
   const grouped = groupConversations(conversations)
+
   const handleClearConveration = () => {
     clearConversations()
-    navigate("/chat")
+    navigate(isChat ? "/chat" : "/completion")
+  }
+
+  const handleNewConverstion = () => {
+    navigate(isChat ? "/chat": "/completion")
   }
   
   return (
@@ -44,7 +56,7 @@ const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
       <SidebarHeader>
       <div className="px-1 py-4 flex justify-between">
         <SidebarButtonTrigger />
-        <NewConversationButton onClick={() => navigate("/chat")} />
+        <NewConversationButton onClick={handleNewConverstion} />
       </div>
       </SidebarHeader>
       <SidebarContent>
@@ -56,7 +68,7 @@ const AppSidebar = ({ ...props }:React.ComponentProps<typeof Sidebar>) => {
                 <div className="px-4 py-2 text-sm font-medium text-gray-500">{label}</div> 
                   {items.map((c:Conversation) => {
                 
-                    const isActive = location.pathname === `/chat/${c.id}` 
+                    const isActive = location.pathname === `/${rootPath}/${c.id}` 
                     return (
                       <SidebarConversationItem 
                         key={c.id}

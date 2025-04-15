@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import AppLayout from './global/AppLayout'
 import ChatLayout from './global/ChatLayout'
 import CompletionLayout from './global/CompletionLayout'
 import Chat from '@/pages/Chat'
@@ -10,17 +11,15 @@ import './App.css'
 function App() {
   return (
     <Routes>
-      <Route path="/chat" element={<ChatLayout />} >
-        <Route index element={<Chat />} />
-        <Route path=":id" element={<Chat />} />
+      <Route element={<AppLayout />} >
+        <Route index path="/chat" element={<Chat />} />
+        <Route path="/chat/:id" element={<Chat />} />
+        <Route path="/completion" element={<Completion />} /> 
+        <Route path="/completion/:id" element={<Completion />} />
       </Route>
-      <Route path="/completion" element={<CompletionLayout />} >
-        <Route index element={<Completion />} />
-        <Route path=":id" element={<Completion />} />
-      </Route> 
       <Route path="/*" element={<NotFoundPage />} />
     </Routes>
   )
 }
 
-export default App
+export default App 
