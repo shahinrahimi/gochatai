@@ -1,49 +1,49 @@
-import React from "react";
-import { 
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "../ui/sidebar"; 
+
 import { Link } from "react-router-dom";
-import { Delete } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { Conversation } from "@/api/types";
+import { Button } from "../ui/button";
+import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 type SidebarConversationItemProps = {
-  c: Conversation
-  root: string
+  c: Conversation;
+  root: string;
   isActive: boolean;
-  onDelete: (id:string) => void
-}
+  onDelete: (id: string) => void;
+};
 
-const SidebarConversationItem = ({root, c, isActive, onDelete}: SidebarConversationItemProps) => {
-  
-  const croppedTitle = c.title.length > 26 ? c.title.slice(0, 23) + '...' : c.title;
- return (
-    <SidebarMenuItem >
-      <SidebarMenuButton 
-        className={`flex justify-between items-center w-full ${isActive ? "bg-cyan-200/50 font-semibold" : ""}`}
-      >
-      <Link 
-        className="text-nowrap flex-10/12" 
-        to={`/${root}/${c.id}`}
-        title={c.title}
-      >
-      {croppedTitle}
-      </Link>
-      {c.messages.length > 0 ? (
-        <span
-          role="button"
-          onClick={() => onDelete(c.id)}
-          className="ml-2 flex-1/12 p-1 rounded justify-center items-center"
+const SidebarConversationItem = ({
+  root,
+  c,
+  isActive,
+  onDelete,
+}: SidebarConversationItemProps) => {
+  const croppedTitle =
+    c.title.length > 26 ? c.title.slice(0, 23) + "..." : c.title;
+
+  return (
+    <SidebarMenuItem key={c.id}>
+      <SidebarMenuButton className={`justify-between ${isActive ? "bg-cyan-100 text-cyan-900 font-semibold" :"hover:bg-muted"}`}>
+        <Link 
+          to={`${root}/${c.id}`} 
+          className="flex flex-col items-start text-nowrap"
+          title={c.title}
         >
-        <Delete className="w-4 h-4 text-gray-400 hover:text-red-500" />
-        </span>
-      ):null}
+          <span>{croppedTitle}</span>
+        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 opacity-0 group-hover/menu-item:opacity-100"
+          onClick={() => onDelete(c.id)}
+        >
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
+        </Button>
       </SidebarMenuButton>
     </SidebarMenuItem>
 
- ) 
-}
-
-
+  )
+};
 
 export default SidebarConversationItem;

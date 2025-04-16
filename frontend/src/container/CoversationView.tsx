@@ -56,7 +56,7 @@ const ConversationView = ({c}:CoversationViewProps) => {
     )
   }
  return (
-   <ol className="my-4 flex flex-col h-fit min-h-full gap-8 bg-red-200 flex-1">
+   <ol className="my-4 flex flex-col h-fit min-h-full gap-8">
       {c.messages.map((message:Message, index) => <MessageView key={index} m={message} />)}
     </ol>
 

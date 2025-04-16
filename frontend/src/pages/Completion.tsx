@@ -59,6 +59,20 @@ const Completion = () => {
   }
 
   const isActive = (!isLoading) && (input.trim() !== "") && model 
+
+const panelRef = React.useRef<HTMLDivElement>(null);
+
+React.useEffect(() => {
+  if (panelRef.current) {
+    if (showAdvanced) {
+      panelRef.current.style.maxHeight = "500px";
+      panelRef.current.style.opacity = "1";
+    } else {
+      panelRef.current.style.maxHeight = "0px";
+      panelRef.current.style.opacity = "0";
+    }
+  }
+}, [showAdvanced]);
     
   
   return (
@@ -111,44 +125,64 @@ const Completion = () => {
           </form>
 
         ):(
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="system-prompt">System Prompt</Label>
-              <Textarea
-                id="system-prompt"
-                value={system}
-                onChange={(e) => setSystem(e.target.value)}
-                placeholder="Enter system prompt..."
-                className="resize-none h-20"
-              />
+
+          <div
+            ref={panelRef}
+            className="transition-all duration-300 ease-in-out overflow-hidden opacity-0 max-h-0"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="system-prompt">System Prompt</Label>
+                <Textarea
+                  id="system-prompt"
+                  value={system}
+                  onChange={(e) => setSystem(e.target.value)}
+                  placeholder="Enter system prompt..."
+                  className="resize-none h-20"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Label htmlFor="temperature">Temperature: {temperature.toFixed(1)}</Label>
+                  </div>
+                  <Slider
+                    id="temperature"
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    value={[temperature]}
+                    onValueChange={(value) => setTemperature(value[0])}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="seed">Seed</Label>
+                  <Input
+                    id="seed"
+                    type="number"
+                    value={seed}
+                    onChange={(e) => setSeed(e.target.value)}
+                    placeholder="Enter seed (optional)"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="temperature">Temperature: {temperature.toFixed(1)}</Label>
-                </div>
-                <Slider
-                  id="temperature"
-                  min={0}
-                  max={1}
-                  step={0.1}
-                  value={[temperature]}
-                  onValueChange={(value) => setTemperature(value[0])}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="seed">Seed</Label>
-                <Input
-                  id="seed"
-                  type="number"
-                  value={seed}
-                  onChange={(e) => setSeed(e.target.value)}
-                  placeholder="Enter seed (optional)"
-                />
-              </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowAdvanced(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => setShowAdvanced(false)}
+              >
+                Save
+              </Button>
             </div>
           </div>
         )}
