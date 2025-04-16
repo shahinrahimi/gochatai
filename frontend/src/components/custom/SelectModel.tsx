@@ -13,8 +13,9 @@ interface SelectModelProps {
   model: LocalModel | null,
   models: LocalModel[],
   setModel: (Model: LocalModel) => void; 
+  className?: string;
 }
-const SelectModel = ({model, models, setModel}:SelectModelProps) => {
+const SelectModel = ({model, models, setModel, className=""}:SelectModelProps) => {
     const handleChangeValue = (value:string) => {
       models.forEach((me:LocalModel) => {
         if (me.name == value) setModel(me)
@@ -22,8 +23,11 @@ const SelectModel = ({model, models, setModel}:SelectModelProps) => {
     } 
 
     return (
-    <Select value={model?.name} onValueChange={(value) => handleChangeValue(value)}>
-      <SelectTrigger className="">
+    <Select 
+      value={model?.name} 
+      onValueChange={(value) => handleChangeValue(value)} 
+      >
+      <SelectTrigger className={`${className} !focus:ring-0`}>
         <SelectValue placeholder="Select a model" />
       </SelectTrigger>
         {models.length > 0 && (

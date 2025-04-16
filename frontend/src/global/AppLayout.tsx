@@ -1,19 +1,16 @@
-
-import React from 'react';
 import {Outlet} from 'react-router-dom'
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import CompletionSidebar from '@/global/CompletionSidbar';
-const CompletionLayout = () => { 
+import AppSidebar from './AppSidebar'; 
+
+const AppLayout = () => { 
   return (
     <SidebarProvider>
-      <CompletionSidebar />
-      <SidebarInset>
+      <AppSidebar />
+      <SidebarInset className='max-w-full h-screen'>
           <Outlet />
       </SidebarInset>
     </SidebarProvider>
-
   ) 
 }
 
-
-export default CompletionLayout;
+export default AppLayout;
